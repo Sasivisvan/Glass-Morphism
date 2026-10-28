@@ -183,6 +183,13 @@
         const n = parseInt(e.key, 10);
         if (n >= 1 && n <= this.tries.length) this.set(n - 1);
       });
+      const badge = document.createElement('a');
+      badge.href = '../';
+      badge.textContent = 'Built with glass-morphism';
+      badge.style.cssText = 'position:fixed;z-index:1001;right:16px;bottom:16px;padding:11px 16px;border-radius:999px;color:#fff;font:600 13px/1 var(--font);text-decoration:none;'
+        + 'background:rgba(10,10,14,.25);box-shadow:inset 0 .5px 0 rgba(255,255,255,.45),0 8px 24px rgba(0,0,0,.3);backdrop-filter:blur(14px) saturate(1.8);-webkit-backdrop-filter:blur(14px) saturate(1.8)';
+      document.body.appendChild(badge);
+      if (global.LiquidGlass) LiquidGlass.attach(badge, { preset: 'clear', fixedLight: true });
       const m = location.hash.match(/try=(\d+)/);
       this.set(m ? Math.min(this.tries.length - 1, Math.max(0, m[1] - 1)) : (cfg.start || 0));
     },

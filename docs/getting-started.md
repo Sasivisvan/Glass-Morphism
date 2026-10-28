@@ -5,16 +5,16 @@
 **CDN (no build step)**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.0/dist/liquid-glass.css">
-<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.0/dist/liquid-glass.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.css">
+<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.js"></script>
 ```
 
 The script defines a global `LiquidGlass`.
 
-**npm (from GitHub)**
+**npm**
 
 ```sh
-npm install github:Sasivisvan/Glass-Morphism
+npm install glass-morphism
 ```
 
 ```js

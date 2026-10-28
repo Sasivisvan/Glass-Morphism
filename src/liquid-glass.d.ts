@@ -82,6 +82,7 @@ export interface LiquidGlassAPI {
   detach(el: HTMLElement): void;
   get(el: HTMLElement): GlassHandle | undefined;
   /** Attach [data-liquid-glass] elements and enhance .lg-* components. */
+  init(opts?: InitOptions): LiquidGlassAPI;
   init(root?: ParentNode, opts?: InitOptions): LiquidGlassAPI;
   initComponents(root?: ParentNode): void;
   /** Move the light for every glass element. */

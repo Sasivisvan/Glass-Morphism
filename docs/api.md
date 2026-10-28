@@ -44,7 +44,7 @@ const h = LiquidGlass.attach(card, { preset: 'regular', chromatic: .08 });
 
 Remove glass from an element, or get its handle (`undefined` if none).
 
-## `init(root?, options?)`
+## `init(root?, options?)` / `init(options)`
 
 Attaches every `[data-liquid-glass]` element under `root` (default `document`) and enhances all [components](components.md). Safe to call more than once: already-enhanced elements are skipped.
 

@@ -1,6 +1,221 @@
 <!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Glass Morphism</title>
-<meta http-equiv="refresh" content="0; url=demo/">
-<link rel="canonical" href="demo/">
-<a href="demo/">Open the demo</a>
+<meta name="description" content="Liquid Glass for the web: real refraction, moving specular highlights and iOS 26-style glass components. Zero dependencies, MIT.">
+<meta property="og:title" content="Glass Morphism: Liquid Glass for the web">
+<meta property="og:description" content="Real refraction, specular rims and iOS 26-style glass components. Zero dependencies.">
+<meta property="og:image" content="docs/images/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dist/liquid-glass.css">
+<link rel="stylesheet" href="site/site.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav lg-toolbar" aria-label="Main">
+  <a class="brand" href="#top"><span class="dot"></span>glass-morphism</a>
+  <a class="nl" href="#features">Features</a>
+  <a class="nl" href="#playground">Playground</a>
+  <a class="nl" href="#components">Components</a>
+  <a class="nl" href="#demos">Demos</a>
+  <a class="nl" href="#start">Get started</a>
+  <a class="gh" href="https://github.com/Sasivisvan/Glass-Morphism" aria-label="GitHub" data-icon="github"></a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <p class="eyebrow">Open source · Zero dependencies · MIT</p>
+    <h1 class="sr-only">Liquid Glass for the web</h1>
+    <div class="hero-title" aria-hidden="true">
+      <div class="glass-word" id="heroWord"></div>
+      <div class="solid-word">for the web</div>
+    </div>
+    <p class="lede">Real refraction computed with Snell's law, specular rims that follow the light, and iOS 26-style glass components, in ~30 KB of vanilla JavaScript.</p>
+    <div class="cta">
+      <a class="lg-button lg-button--prominent" href="#start">Get started</a>
+      <a class="lg-button" href="https://github.com/Sasivisvan/Glass-Morphism"><span data-icon="github"></span> GitHub</a>
+    </div>
+    <div class="install lg" data-liquid-glass="regular">
+      <code id="installCmd">npm install glass-morphism</code>
+      <button class="copy" data-copy="#installCmd" aria-label="Copy install command" data-icon="copy"></button>
+    </div>
+  </div>
+  <div class="lens lg lg--clear" data-liquid-glass="prism" id="heroLens" aria-hidden="true"><span>drag me</span></div>
+</header>
+
+<main>
+  <!-- ============ FEATURES ============ -->
+  <section class="section" id="features">
+    <div class="section-head">
+      <p class="eyebrow">Why it's different</p>
+      <h2>Not a blur. It bends light.</h2>
+      <p class="sub">Most "glassmorphism" frosts the background. Apple's Liquid Glass refracts it: the curved rim bends what's behind it while the centre stays clear. This library does the optics.</p>
+    </div>
+    <div class="photo-band band-features">
+      <div class="features">
+        <article class="feature lg" data-liquid-glass="regular"><span class="f-ic" data-icon="lens"></span><h3>Physically based</h3><p>Squircle rim, index of refraction, magnification and chromatic dispersion, computed per pixel.</p></article>
+        <article class="feature lg" data-liquid-glass="regular"><span class="f-ic" data-icon="sun"></span><h3>Moving light</h3><p>Specular rims follow the pointer, or device tilt on phones, just like on iPhone.</p></article>
+        <article class="feature lg" data-liquid-glass="regular"><span class="f-ic" data-icon="grid"></span><h3>Components</h3><p>Buttons, switches, sliders, segmented controls, tab bars, toolbars and morphing menus.</p></article>
+        <article class="feature lg" data-liquid-glass="regular"><span class="f-ic" data-icon="text"></span><h3>Glass text</h3><p>Any string becomes a lens, like the iOS 26 lock screen clock.</p></article>
+        <article class="feature lg" data-liquid-glass="regular"><span class="f-ic" data-icon="layers"></span><h3>Progressive</h3><p>Frosted fallback in Firefox and Safari, real inputs underneath, and support for reduced transparency and motion.</p></article>
+        <article class="feature lg" data-liquid-glass="regular"><span class="f-ic" data-icon="bolt"></span><h3>Tiny</h3><p>No dependencies. UMD, ES modules and TypeScript types. A WebGL renderer when you need every browser.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLAYGROUND ============ -->
+  <section class="section" id="playground">
+    <div class="section-head">
+      <p class="eyebrow">Playground</p>
+      <h2>Tune the glass</h2>
+      <p class="sub">Pick a preset, adjust the optics, and copy the code. The controls are the library's own components.</p>
+    </div>
+    <div class="playground">
+      <div class="pg-stage" id="pgStage">
+        <div class="pg-target lg" id="pgTarget"><span>Liquid Glass</span></div>
+        <div class="pg-hint">Drag the glass</div>
+      </div>
+      <div class="pg-panel">
+        <div class="lg-segmented pg-presets" id="pgPresets">
+          <button aria-pressed="true">regular</button><button>clear</button><button>tinted</button><button>prism</button>
+        </div>
+        <div class="pg-controls" id="pgControls"></div>
+        <div class="codebox">
+          <pre><code id="pgCode"></code></pre>
+          <button class="copy" data-copy="#pgCode" aria-label="Copy code" data-icon="copy"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPONENTS ============ -->
+  <section class="section" id="components">
+    <div class="section-head">
+      <p class="eyebrow">Components</p>
+      <h2>Drop-in glass controls</h2>
+      <p class="sub">Plain HTML plus <code>LiquidGlass.init()</code>. Press and hold: thumbs turn into magnifying lenses, selections become droplets.</p>
+    </div>
+    <div class="photo-band band-components">
+      <div class="comp-grid">
+        <div class="comp">
+          <div class="comp-live"><button class="lg-button">Glass</button><button class="lg-button lg-button--prominent">Prominent</button><button class="lg-button lg-button--icon" aria-label="Like" data-icon="heart"></button></div>
+          <div class="comp-name">Button</div>
+          <pre class="comp-code"><code>&lt;button class="lg-button"&gt;Glass&lt;/button&gt;
+&lt;button class="lg-button lg-button--prominent"&gt;…&lt;/button&gt;</code></pre>
+        </div>
+        <div class="comp">
+          <div class="comp-live"><label class="lg-switch"><input type="checkbox" checked aria-label="Demo switch"></label><label class="lg-switch"><input type="checkbox" aria-label="Demo switch 2"></label></div>
+          <div class="comp-name">Switch</div>
+          <pre class="comp-code"><code>&lt;label class="lg-switch"&gt;
+  &lt;input type="checkbox" checked&gt;
+&lt;/label&gt;</code></pre>
+        </div>
+        <div class="comp">
+          <div class="comp-live"><div class="lg-slider" style="width:240px"><input type="range" value="40" aria-label="Demo slider"></div></div>
+          <div class="comp-name">Slider</div>
+          <pre class="comp-code"><code>&lt;div class="lg-slider"&gt;
+  &lt;input type="range" value="40"&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+        <div class="comp">
+          <div class="comp-live"><div class="lg-segmented"><button>Day</button><button aria-pressed="true">Week</button><button>Month</button></div></div>
+          <div class="comp-name">Segmented control</div>
+          <pre class="comp-code"><code>&lt;div class="lg-segmented"&gt;
+  &lt;button&gt;Day&lt;/button&gt;
+  &lt;button aria-pressed="true"&gt;Week&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+        <div class="comp">
+          <div class="comp-live"><nav class="lg-tabbar" style="width:310px" id="demoTabs"></nav></div>
+          <div class="comp-name">Tab bar</div>
+          <pre class="comp-code"><code>&lt;nav class="lg-tabbar"&gt;
+  &lt;a class="lg-tabbar__item" aria-current="page"&gt;…&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+        </div>
+        <div class="comp">
+          <div class="comp-live comp-live--menu">
+            <div class="lg-toolbar"><button aria-label="Back" data-icon="chevronLeft"></button><hr><button aria-label="Star" data-icon="star"></button><button aria-label="Search" data-icon="search"></button></div>
+            <div class="menu-slot"><div class="lg-menu"><button class="lg-menu__trigger" aria-label="More" data-icon="ellipsis"></button><div class="lg-menu__panel"><button class="lg-menu__item">Share <span data-icon="plus"></span></button><button class="lg-menu__item">Favorite <span data-icon="star"></span></button><button class="lg-menu__item">Settings <span data-icon="gear"></span></button></div></div></div>
+          </div>
+          <div class="comp-name">Toolbar &amp; morphing menu</div>
+          <pre class="comp-code"><code>&lt;div class="lg-menu"&gt;
+  &lt;button class="lg-menu__trigger"&gt;…&lt;/button&gt;
+  &lt;div class="lg-menu__panel"&gt;…&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+    <p class="more"><a href="#" data-doc="components.md">All components and options →</a></p>
+  </section>
+
+  <!-- ============ DEMOS ============ -->
+  <section class="section" id="demos">
+    <div class="section-head">
+      <p class="eyebrow">Recreations</p>
+      <h2>Real iPhone screens, rebuilt</h2>
+      <p class="sub">Each demo has several attempts you can flip between to compare techniques, from plain CSS blur to WebGL.</p>
+    </div>
+    <div class="demos">
+      <a class="demo" href="demo/lens.html"><img src="demo/assets/thumbs/lens.jpg" alt="" loading="lazy"><div><b>Lens Lab</b><span>Five techniques, live sliders, merging WebGL glass</span></div></a>
+      <a class="demo" href="demo/tabbar.html"><img src="demo/assets/thumbs/tabbar.jpg" alt="" loading="lazy"><div><b>Floating Tab Bar</b><span>Minimise on scroll, droplet selection</span></div></a>
+      <a class="demo" href="demo/control-center.html"><img src="demo/assets/thumbs/control-center.jpg" alt="" loading="lazy"><div><b>Control Center</b><span>iOS 18 vs 26 Clear vs 26.1 Tinted</span></div></a>
+      <a class="demo" href="demo/lockscreen.html"><img src="demo/assets/thumbs/lockscreen.jpg" alt="" loading="lazy"><div><b>Lock Screen</b><span>Glass clock, clear notifications</span></div></a>
+      <a class="demo" href="demo/components.html"><img src="demo/assets/thumbs/components.jpg" alt="" loading="lazy"><div><b>Components</b><span>Everything, three material modes</span></div></a>
+      <a class="demo" href="demo/materials.html"><img src="demo/assets/thumbs/materials.jpg" alt="" loading="lazy"><div><b>Classic Materials</b><span>The iOS 7–18 blur hierarchy</span></div></a>
+    </div>
+    <p class="more"><a href="demo/">Research notes and all demos →</a></p>
+  </section>
+
+  <!-- ============ GET STARTED ============ -->
+  <section class="section" id="start">
+    <div class="section-head">
+      <p class="eyebrow">Get started</p>
+      <h2>Three lines</h2>
+    </div>
+    <div class="start">
+      <div class="lg-segmented start-tabs" id="startTabs"><button aria-pressed="true">CDN</button><button>npm</button><button>ES module</button></div>
+      <div class="codebox codebox--big">
+        <pre><code id="startCode"></code></pre>
+        <button class="copy" data-copy="#startCode" aria-label="Copy code" data-icon="copy"></button>
+      </div>
+      <div class="support">
+        <div><b>Chrome · Edge · Brave · Arc</b><span>Full refraction</span></div>
+        <div><b>Firefox · Safari</b><span>Frosted fallback</span></div>
+        <div><b>Any WebGL2 browser</b><span>Refraction via LiquidGlassGL</span></div>
+      </div>
+      <div class="doclinks">
+        <a class="lg-button lg-button--small" data-doc="getting-started.md" href="#">Getting started</a>
+        <a class="lg-button lg-button--small" data-doc="api.md" href="#">API reference</a>
+        <a class="lg-button lg-button--small" data-doc="components.md" href="#">Components</a>
+        <a class="lg-button lg-button--small" data-doc="how-it-works.md" href="#">How it works</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="foot-inner">
+    <div>
+      <div class="brand"><span class="dot"></span>glass-morphism</div>
+      <p>Liquid Glass for the web. MIT licensed.</p>
+    </div>
+    <div class="credits">
+      <p>Created by <a href="https://github.com/Sasivisvan">Sasivisvan</a> · Contributor <a href="https://github.com/Kathin-M">Kathin-M</a></p>
+      <p class="fine">Photos from Unsplash via Lorem Picsum (Unsplash License). Snell's-law approach inspired by kube.io. An independent project, not affiliated with Apple. "Liquid Glass", iOS and iPhone are trademarks of Apple Inc.</p>
+    </div>
+  </div>
+</footer>
+
+<a class="built-with lg lg--pill" data-liquid-glass="clear" href="https://github.com/Sasivisvan/Glass-Morphism"><span class="dot"></span>Built with glass-morphism</a>
+
+<script src="dist/liquid-glass.js"></script>
+<script src="site/site.js"></script>
+</body>
+</html>

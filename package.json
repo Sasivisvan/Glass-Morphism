@@ -1,6 +1,6 @@
 {
   "name": "glass-morphism",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Liquid Glass for the web: real refraction (Snell's law displacement maps), specular rims, presets and iOS 26-style glass components. Zero dependencies.",
   "keywords": [
     "liquid-glass",
@@ -13,7 +13,7 @@
     "ios-26",
     "ui-components"
   ],
-  "homepage": "https://sasivisvan.github.io/Glass-Morphism/",
+  "homepage": "https://glass-morphism.vercel.app",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Sasivisvan/Glass-Morphism.git"

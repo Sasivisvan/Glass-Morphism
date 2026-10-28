@@ -5,9 +5,9 @@
 **Liquid Glass for the web.** Real refraction, moving specular highlights, and iOS 26-style glass components.<br>
 Zero dependencies · ~30 KB · MIT
 
-[**Live demo**](https://sasivisvan.github.io/Glass-Morphism/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
+[**Website**](https://glass-morphism.vercel.app) · [Demos](https://glass-morphism.vercel.app/demo/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
 
-![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
+[![npm](https://img.shields.io/npm/v/glass-morphism)](https://www.npmjs.com/package/glass-morphism) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
 
 ![Glass lens with dispersion refracting a photo](docs/images/hero.jpg)
 
@@ -29,8 +29,8 @@ Most "glassmorphism" on the web is a blur. Apple's Liquid Glass **bends light**:
 ## Quick start
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.0/dist/liquid-glass.css">
-<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.0/dist/liquid-glass.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.css">
+<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.js"></script>
 
 <div style="background:url(photo.jpg) center/cover; padding:80px">
   <div class="lg" data-liquid-glass="clear" style="border-radius:32px; padding:24px">Hello, glass</div>
@@ -41,10 +41,10 @@ Most "glassmorphism" on the web is a blur. Apple's Liquid Glass **bends light**:
 <script>LiquidGlass.init({ light: 'pointer' });</script>
 ```
 
-Or with a bundler:
+Or with npm:
 
 ```sh
-npm install github:Sasivisvan/Glass-Morphism
+npm install glass-morphism
 ```
 
 ```js
@@ -84,7 +84,7 @@ Full markup, events and theming: **[docs/components.md](docs/components.md)**.
 
 ## Recreations
 
-The [demo site](https://sasivisvan.github.io/Glass-Morphism/) rebuilds real iPhone screens, each with several attempts you can flip between (keys <kbd>1</kbd>–<kbd>5</kbd>) to compare techniques.
+The [demo site](https://glass-morphism.vercel.app/demo/) rebuilds real iPhone screens, each with several attempts you can flip between (keys <kbd>1</kbd>–<kbd>5</kbd>) to compare techniques.
 
 ![Tab bar, Control Center and Lock Screen recreations](docs/images/screens.jpg)
 
@@ -122,6 +122,23 @@ See the **[API reference](docs/api.md)** for every option and default.
 | Any browser with WebGL2 | ✅ via `LiquidGlassGL` | — |
 
 Only Chromium accepts SVG filters in `backdrop-filter` today. **[How it works](docs/how-it-works.md)** covers the optics, the Chromium quirks, and the limits.
+
+## Built with glass-morphism
+
+Using it? Add the badge to your site (it's glass too):
+
+```html
+<a class="lg lg--pill" data-liquid-glass="clear" href="https://github.com/Sasivisvan/Glass-Morphism"
+   style="position:fixed;right:18px;bottom:18px;padding:11px 16px;color:#fff;font:600 13px system-ui;text-decoration:none">
+  Built with glass-morphism
+</a>
+```
+
+Or in a README: [![Built with glass-morphism](https://img.shields.io/badge/built%20with-glass--morphism-0a84ff)](https://github.com/Sasivisvan/Glass-Morphism)
+
+```md
+[![Built with glass-morphism](https://img.shields.io/badge/built%20with-glass--morphism-0a84ff)](https://github.com/Sasivisvan/Glass-Morphism)
+```
 
 ## Development
 

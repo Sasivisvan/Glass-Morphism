@@ -678,7 +678,9 @@
     return o;
   }
 
+  // init(), init(root), init(options) or init(root, options)
   function init(root, opts) {
+    if (root && typeof root.querySelectorAll !== 'function') { opts = root; root = null; }
     root = root || document;
     opts = opts || {};
     const isComponent = el => COMPONENTS.some(([sel]) => el.matches(sel)) || el.classList.contains('lg-thumb') || el.classList.contains('lg-indicator');
@@ -694,7 +696,7 @@
 
   /* ---------- public API ---------- */
   const LiquidGlass = {
-    version: '1.0.0',
+    version: '1.0.1',
     supported,
     DEFAULTS,
     PRESETS,

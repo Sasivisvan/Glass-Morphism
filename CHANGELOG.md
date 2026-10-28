@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-10-29
+
+- `init()` now also accepts options as its first argument: `LiquidGlass.init({ light: 'pointer' })`.
+- Published to npm as `glass-morphism`.
+- New showcase site with a live playground.
+
 ## 1.0.0 — 2026-10-28
 
 First release.
