@@ -5,7 +5,7 @@
 **Liquid Glass for the web.** Real refraction, moving specular highlights, and iOS 26-style glass components.<br>
 Zero dependencies · ~30 KB · MIT
 
-[**Website**](https://glass-morphism.vercel.app) · [Demos](https://glass-morphism.vercel.app/demo/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
+[**Website**](https://glass-morphism-flax.vercel.app) · [Demos](https://glass-morphism-flax.vercel.app/demo/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
 
 [![npm](https://img.shields.io/npm/v/glass-morphism)](https://www.npmjs.com/package/glass-morphism) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
 
@@ -84,7 +84,7 @@ Full markup, events and theming: **[docs/components.md](docs/components.md)**.
 
 ## Recreations
 
-The [demo site](https://glass-morphism.vercel.app/demo/) rebuilds real iPhone screens, each with several attempts you can flip between (keys <kbd>1</kbd>–<kbd>5</kbd>) to compare techniques.
+The [demo site](https://glass-morphism-flax.vercel.app/demo/) rebuilds real iPhone screens, each with several attempts you can flip between (keys <kbd>1</kbd>–<kbd>5</kbd>) to compare techniques.
 
 ![Tab bar, Control Center and Lock Screen recreations](docs/images/screens.jpg)
 
