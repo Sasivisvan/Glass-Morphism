@@ -1,6 +1,6 @@
 {
   "name": "@sasivisvan/glass-morphism",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Liquid Glass for the web: real refraction (Snell's law displacement maps), specular rims, presets and iOS 26-style glass components. Zero dependencies.",
   "keywords": [
     "liquid-glass",

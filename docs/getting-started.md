@@ -5,8 +5,8 @@
 **CDN (no build step)**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.css">
-<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.2/dist/liquid-glass.css">
+<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.2/dist/liquid-glass.js"></script>
 ```
 
 The script defines a global `LiquidGlass`.

@@ -38,8 +38,10 @@ A second image holds the rim light. Its intensity depends on how much the edge n
 ### 6. Applying it
 
 ```css
-backdrop-filter: blur(<frost>px) url(#generated-filter);
+backdrop-filter: blur(0px) url(#generated-filter);
 ```
+
+Inside the filter the order is: refract → frost (`feGaussianBlur`) → saturate → specular. Frosting *after* refraction matters: blurring the backdrop first would leave nothing for the lens to bend, and the glass would read as plain frosted plastic.
 
 Two Chromium details matter here:
 

@@ -41,7 +41,7 @@ const LiquidGlass = (function () {
     lightAngle: -135,   // degrees, screen space, direction toward the light (-90 = above, -135 = top-left)
     fixedLight: false,  // true = ignore LiquidGlass.setLight()
     radius: null,       // override corner radius; null = read from CSS
-    fallbackBlur: 14,
+    fallbackBlur: null, // blur used without SVG backdrop filters; null = derived from `blur`
   };
 
   const PROFILES = {
@@ -258,7 +258,13 @@ const LiquidGlass = (function () {
     } else {
       f.appendChild(svgEl('feDisplacementMap', { in: src, in2: 'map', scale, xChannelSelector: 'R', yChannelSelector: 'G', result: 'disp' }));
     }
-    f.appendChild(svgEl('feColorMatrix', { in: 'disp', type: 'saturate', values: o.saturate, result: 'sat' }));
+    // Frost goes after the refraction: blurring first would leave nothing for the lens to bend.
+    let refracted = 'disp';
+    if (o.blur > 0) {
+      f.appendChild(svgEl('feGaussianBlur', { in: 'disp', stdDeviation: o.blur, edgeMode: 'duplicate', result: 'frost' }));
+      refracted = 'frost';
+    }
+    f.appendChild(svgEl('feColorMatrix', { in: refracted, type: 'saturate', values: o.saturate, result: 'sat' }));
     let last = 'sat';
     if (o.brightness !== 1) {
       const ct = svgEl('feComponentTransfer', { in: 'sat', result: 'bright' });
@@ -299,15 +305,16 @@ const LiquidGlass = (function () {
       if (this.raf) return;
       this.raf = requestAnimationFrame(() => { this.raf = 0; this.render(); });
     }
+    // Changes are coalesced: many update() calls in one frame cause one rebuild.
     update(opts) {
       Object.assign(this.opts, opts);
       this.size = '';
-      this.render();
+      this.schedule();
     }
     render() {
       const o = this.opts, el = this.el;
       if (!supported) {
-        const fb = `blur(${o.fallbackBlur}px) saturate(${o.saturate})`;
+        const fb = `blur(${o.fallbackBlur != null ? o.fallbackBlur : Math.round(4 + o.blur * 1.5)}px) saturate(${o.saturate})`;
         el.style.backdropFilter = el.style.webkitBackdropFilter = fb;
         return;
       }
@@ -330,7 +337,7 @@ const LiquidGlass = (function () {
       this.filter = f;
       // A CSS function before url() is required: without it Chromium feeds the
       // SVG filter a backdrop whose dark pixels come through as transparent.
-      el.style.backdropFilter = `blur(${Math.max(0, o.blur)}px) url(#${id})`;
+      el.style.backdropFilter = `blur(0px) url(#${id})`;
     }
     destroy() {
       live.delete(this);
@@ -347,7 +354,7 @@ const LiquidGlass = (function () {
    * ===================================================================== */
   const PRESETS = {
     // Apple's default "Regular" glass: light frost, strong rim lensing.
-    regular: { bezel: 16, thickness: 18, blur: 3, saturate: 1.7, brightness: 0.95, specular: 0.75 },
+    regular: { bezel: 16, thickness: 20, blur: 1.5, saturate: 1.6, brightness: 0.96, specular: 0.75 },
     // "Clear" glass for use over media: almost no frost, the lens does the work.
     clear: { bezel: 20, thickness: 24, blur: 0.5, saturate: 1.5, brightness: 0.98, specular: 0.9, chromatic: 0.05 },
     // iOS 26.1 "Tinted": more frost and less sparkle, for legibility.
@@ -539,8 +546,7 @@ const LiquidGlass = (function () {
       wrap.classList.add('is-dragging');
       lensOn(thumb);
       set(e);
-      e.preventDefault();
-      input.focus({ preventScroll: true });
+      e.preventDefault(); // keep focus off the hidden input so later keys/wheel don't move it
     });
     wrap.addEventListener('pointermove', e => { if (down) set(e); });
     const up = () => {
@@ -693,7 +699,7 @@ const LiquidGlass = (function () {
 
   /* ---------- public API ---------- */
   const LiquidGlass = {
-    version: '1.0.1',
+    version: '1.0.2',
     supported,
     DEFAULTS,
     PRESETS,

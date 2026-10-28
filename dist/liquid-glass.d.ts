@@ -19,7 +19,7 @@ export interface GlassOptions {
   strength?: number;
   /** 0–0.3: pull the interior toward the centre (magnifying lens). Default 0. */
   magnify?: number;
-  /** Frost blur in px, applied before refraction. Default 2. */
+  /** Frost blur in px, applied after refraction. Default 2. */
   blur?: number;
   /** Backdrop saturation. Default 1.5. */
   saturate?: number;
@@ -35,7 +35,7 @@ export interface GlassOptions {
   fixedLight?: boolean;
   /** Override the corner radius in px; null = read from CSS. */
   radius?: number | null;
-  /** Blur used when SVG backdrop filters are unsupported. Default 14. */
+  /** Blur used when SVG backdrop filters are unsupported. Default: derived from `blur`. */
   fallbackBlur?: number;
   /** Alpha canvas defining an arbitrary glass shape (e.g. text). */
   shape?: HTMLCanvasElement;

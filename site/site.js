@@ -106,9 +106,9 @@
   /* ---------- playground ---------- */
   const target = $('#pgTarget');
   const CONTROLS = [
-    ['bezel', 'Bezel', 4, 60, 1], ['thickness', 'Thickness', 0, 80, 1], ['ior', 'IOR', 1, 2.4, 0.05],
-    ['blur', 'Frost', 0, 12, 0.5], ['saturate', 'Saturation', 0.5, 2.5, 0.05], ['chromatic', 'Dispersion', 0, 0.4, 0.01],
-    ['magnify', 'Magnify', 0, 0.3, 0.01], ['specular', 'Specular', 0, 1, 0.05],
+    ['bezel', 'Bezel', 4, 50, 1], ['thickness', 'Thickness', 0, 60, 1], ['ior', 'IOR', 1, 2, 0.05],
+    ['blur', 'Frost', 0, 8, 0.5], ['saturate', 'Saturation', 0.5, 2.2, 0.05], ['chromatic', 'Dispersion', 0, 0.3, 0.01],
+    ['magnify', 'Magnify', 0, 0.25, 0.01], ['specular', 'Specular', 0, 1, 0.05],
   ];
   let preset = 'regular';
   const state = {};
@@ -155,7 +155,7 @@
   loadPreset('regular');
 
   /* ---------- get started tabs ---------- */
-  const CDN = 'https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist';
+  const CDN = 'https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.2/dist';
   const SNIPPETS = {
     CDN: `<link rel="stylesheet" href="${CDN}/liquid-glass.css">
 <script src="${CDN}/liquid-glass.js"></script>

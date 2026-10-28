@@ -33,8 +33,8 @@ Most "glassmorphism" on the web is a blur. Apple's Liquid Glass **bends light**:
 ## Quick start
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.css">
-<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.1/dist/liquid-glass.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.2/dist/liquid-glass.css">
+<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.2/dist/liquid-glass.js"></script>
 
 <div style="background:url(photo.jpg) center/cover; padding:80px">
   <div class="lg" data-liquid-glass="clear" style="border-radius:32px; padding:24px">Hello, glass</div>

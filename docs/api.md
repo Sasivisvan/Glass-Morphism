@@ -20,7 +20,7 @@ const h = LiquidGlass.attach(card, { preset: 'regular', chromatic: .08 });
 | `profile` | `'squircle'` | Rim surface shape: `'squircle'`, `'circle'`, `'lip'` (raised rim), `'linear'`. |
 | `strength` | `1` | Multiplier on the final displacement. |
 | `magnify` | `0` | `0`–`0.3`. Pulls the interior toward the centre, like a magnifier. |
-| `blur` | `2` | Frost in px, applied before refraction. |
+| `blur` | `2` | Frost in px, applied after refraction so the rim lensing stays visible. |
 | `saturate` | `1.5` | Saturation of what's seen through the glass. |
 | `brightness` | `1` | Brightness multiplier. Below 1 helps white text on bright backgrounds. |
 | `chromatic` | `0` | `0`–`0.4`. Splits R/G/B for colour fringing at the rim. |
@@ -28,7 +28,7 @@ const h = LiquidGlass.attach(card, { preset: 'regular', chromatic: .08 });
 | `lightAngle` | `-135` | Direction toward the light in degrees, screen space. `-90` is straight up, `-135` is top-left. |
 | `fixedLight` | `false` | Ignore `setLight()` / `followPointer()`. |
 | `radius` | `null` | Corner radius override in px. `null` reads `border-radius` from CSS. |
-| `fallbackBlur` | `14` | Blur used in browsers without SVG backdrop filters. |
+| `fallbackBlur` | `null` | Blur used in browsers without SVG backdrop filters. `null` derives it from `blur` (4 + 1.5 × blur px). |
 | `shape` | — | An alpha `<canvas>` for non-rectangular glass. See `attachText`. |
 
 ### `GlassHandle`
@@ -65,7 +65,7 @@ Attaches every `[data-liquid-glass]` element under `root` (default `document`) a
 
 | Preset | Use for | Values |
 | --- | --- | --- |
-| `regular` | Bars, cards, buttons: the default | bezel 16 · thickness 18 · blur 3 · saturate 1.7 · brightness .95 · specular .75 |
+| `regular` | Bars, cards, buttons: the default | bezel 16 · thickness 20 · blur 1.5 · saturate 1.6 · brightness .96 · specular .75 |
 | `clear` | Over photos and video | bezel 20 · thickness 24 · blur .5 · saturate 1.5 · specular .9 · chromatic .05 |
 | `tinted` | Maximum legibility (like iOS 26.1 "Tinted") | bezel 18 · thickness 18 · blur 6 · saturate 1.5 · specular .55 |
 | `prism` | Showpiece lenses | bezel 34 · thickness 40 · ior 1.6 · chromatic .16 · magnify .08 |
