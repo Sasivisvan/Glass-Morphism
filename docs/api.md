@@ -115,7 +115,7 @@ The lower-level helper: an alpha canvas you can pass as `shape`, plus a 2× mask
 
 ## WebGL renderer
 
-`dist/liquid-glass-gl.js` (global `LiquidGlassGL`, or `import LiquidGlassGL from 'glass-morphism/gl'`) renders the same optics in a WebGL2 shader. It works in every browser and adds frost from mipmaps, dispersion, a Fresnel rim, a drop shadow, and **shapes that melt together**.
+`dist/liquid-glass-gl.js` (global `LiquidGlassGL`, or `import LiquidGlassGL from '@sasivisvan/glass-morphism/gl'`) renders the same optics in a WebGL2 shader. It works in every browser and adds frost from mipmaps, dispersion, a Fresnel rim, a drop shadow, and **shapes that melt together**.
 
 The trade-off: the shader can only refract a texture you give it, so you paint your backdrop into a canvas.
 

@@ -1,4 +1,4 @@
-// Type definitions for glass-morphism (LiquidGlass)
+// Type definitions for @sasivisvan/glass-morphism (LiquidGlass)
 // https://github.com/Sasivisvan/Glass-Morphism
 
 export type Profile = 'squircle' | 'circle' | 'lip' | 'linear';

@@ -14,15 +14,15 @@ The script defines a global `LiquidGlass`.
 **npm**
 
 ```sh
-npm install glass-morphism
+npm install @sasivisvan/glass-morphism
 ```
 
 ```js
-import LiquidGlass from 'glass-morphism';
-import 'glass-morphism/css';
+import LiquidGlass from '@sasivisvan/glass-morphism';
+import '@sasivisvan/glass-morphism/css';
 ```
 
-CommonJS also works: `const LiquidGlass = require('glass-morphism')`.
+CommonJS also works: `const LiquidGlass = require('@sasivisvan/glass-morphism')`.
 
 **Copy the files**: everything you need is in [`dist/`](../dist): `liquid-glass.js` (or `.mjs`) and `liquid-glass.css`.
 

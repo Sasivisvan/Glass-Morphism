@@ -7,7 +7,7 @@ Zero dependencies · ~30 KB · MIT
 
 [**Website**](https://glass-morphism-flax.vercel.app) · [Demos](https://glass-morphism-flax.vercel.app/demo/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
 
-[![npm](https://img.shields.io/npm/v/glass-morphism)](https://www.npmjs.com/package/glass-morphism) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
+[![npm](https://img.shields.io/npm/v/@sasivisvan/glass-morphism)](https://www.npmjs.com/package/@sasivisvan/glass-morphism) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
 
 ![Glass lens with dispersion refracting a photo](docs/images/hero.jpg)
 
@@ -44,12 +44,12 @@ Most "glassmorphism" on the web is a blur. Apple's Liquid Glass **bends light**:
 Or with npm:
 
 ```sh
-npm install glass-morphism
+npm install @sasivisvan/glass-morphism
 ```
 
 ```js
-import LiquidGlass from 'glass-morphism';
-import 'glass-morphism/css';
+import LiquidGlass from '@sasivisvan/glass-morphism';
+import '@sasivisvan/glass-morphism/css';
 
 LiquidGlass.init();
 LiquidGlass.attach(document.querySelector('.card'), { preset: 'clear', chromatic: .08 });

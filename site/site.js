@@ -164,10 +164,10 @@
 <button class="lg-button">Glass button</button>
 
 <script>LiquidGlass.init({ light: 'pointer' });</script>`,
-    npm: `npm install glass-morphism
+    npm: `npm install @sasivisvan/glass-morphism
 
-import LiquidGlass from 'glass-morphism';
-import 'glass-morphism/css';
+import LiquidGlass from '@sasivisvan/glass-morphism';
+import '@sasivisvan/glass-morphism/css';
 
 LiquidGlass.init();
 LiquidGlass.attach(document.querySelector('.card'), 'clear');`,
@@ -180,5 +180,5 @@ LiquidGlass.attach(document.querySelector('.card'), 'clear');`,
   const startCode = $('#startCode');
   setCode(startCode, SNIPPETS.CDN);
   $('#startTabs').addEventListener('lg-change', e => setCode(startCode, SNIPPETS[e.detail.item.textContent.trim()]));
-  setCode($('#installCmd'), 'npm install glass-morphism');
+  setCode($('#installCmd'), 'npm install @sasivisvan/glass-morphism');
 })();
