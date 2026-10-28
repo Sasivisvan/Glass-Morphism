@@ -5,7 +5,11 @@
 **Liquid Glass for the web.** Real refraction, moving specular highlights, and iOS 26-style glass components.<br>
 Zero dependencies · ~30 KB · MIT
 
-[**Website**](https://glass-morphism-flax.vercel.app) · [Demos](https://glass-morphism-flax.vercel.app/demo/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
+```sh
+npm install @sasivisvan/glass-morphism
+```
+
+[**Website**](https://glass-morphism-flax.vercel.app) · [Demos](https://glass-morphism-flax.vercel.app/demo/) · [npm](https://www.npmjs.com/package/@sasivisvan/glass-morphism) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
 
 [![npm](https://img.shields.io/npm/v/@sasivisvan/glass-morphism)](https://www.npmjs.com/package/@sasivisvan/glass-morphism) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
 
