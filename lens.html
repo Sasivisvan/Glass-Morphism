@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass Lens Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .lab {
+    position: relative; width: 100%; height: clamp(520px, calc(100vh - 130px), 760px);
+    border-radius: 28px; overflow: hidden; isolation: isolate; background: #222;
+    box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 .5px var(--line);
+  }
+  .lab canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #gl { display: none; }
+  body.t-gl #gl { display: block; }
+
+  .obj {
+    position: absolute; cursor: grab; user-select: none;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    color: #fff; font-weight: 600; text-shadow: 0 1px 8px rgba(0,0,0,.25);
+    transition: transform .5s cubic-bezier(.2, 1.5, .4, 1);
+  }
+  .obj.dragging { cursor: grabbing; transform: scale(1.06); }
+  .obj.pill { width: 250px; height: 78px; border-radius: 39px; font-size: 19px; left: 6%; top: 52%; }
+  .obj.drop { width: 156px; height: 156px; border-radius: 50%; left: 48%; top: 14%; font-size: 36px; }
+  .obj.card { width: 310px; height: 196px; border-radius: 36px; left: 60%; top: 52%; flex-direction: column; align-items: stretch; justify-content: space-between; padding: 20px 22px; }
+  .obj.mini { width: 88px; height: 88px; border-radius: 50%; left: 34%; top: 66%; font-size: 30px; }
+  .obj.card .row { display: flex; align-items: center; gap: 12px; }
+  .obj.card .art { width: 52px; height: 52px; border-radius: 12px; background: url(assets/img/p1069.jpg) center/cover; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+  .obj.card .t1 { font-size: 16px; }
+  .obj.card .t2 { font-size: 13px; opacity: .7; font-weight: 500; }
+  .obj.card .ctrl { display: flex; justify-content: space-around; font-size: 26px; }
+  .obj.card .bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,.3); overflow: hidden; }
+  .obj.card .bar i { display: block; width: 38%; height: 100%; background: rgba(255,255,255,.9); }
+
+  /* Try 1 — classic frosted CSS */
+  body.t-frost .obj { --blur: 18px; --sat: 180%; --tint: rgba(255,255,255,.12); }
+  /* Try 2 — noise displacement */
+  body.t-noise .obj { --tint: rgba(255,255,255,.06); }
+  body.t-noise.chromium .obj { backdrop-filter: blur(2px) url(#noise) saturate(160%); }
+  /* Try 3/4 — Snell's law maps (inline backdrop from liquid-glass.js) */
+  body.t-snell .obj { --tint: rgba(255,255,255,.04); --shadow: 0 10px 30px rgba(0,0,0,.2); }
+  body.t-snell .obj::before { opacity: .55; }
+  /* Try 5 — WebGL draws the glass; DOM objects only carry content */
+  body.t-gl .obj { background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  body.t-gl .obj::before { display: none; }
+
+  .hint { position: absolute; left: 18px; bottom: 14px; z-index: 5; font-size: 12px; color: rgba(255,255,255,.75); pointer-events: none; }
+  #gl-only { display: none; }
+  body.t-gl #gl-only { display: grid; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="noise" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.009 0.012" numOctaves="2" seed="4" result="n"/>
+    <feGaussianBlur in="n" stdDeviation="3" result="nb"/>
+    <feDisplacementMap in="SourceGraphic" in2="nb" scale="80" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">Tune it</div>
+      <div class="tweaks" id="tweaks"></div>
+      <p class="kbd" style="margin:12px 0 0">Sliders affect attempts 3–5.</p>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="lab" id="lab">
+      <canvas id="bg"></canvas>
+      <canvas id="gl"></canvas>
+      <div class="obj glass pill" data-glass="pill"></div>
+      <div class="obj glass drop" data-glass="drop"></div>
+      <div class="obj glass mini" data-glass="mini"></div>
+      <div class="obj glass card" data-glass="card">
+        <div class="row"><div class="art"></div><div><div class="t1">Midnight Drift</div><div class="t2">Tidal Lights</div></div></div>
+        <div class="bar"><i></i></div>
+        <div class="ctrl"></div>
+      </div>
+      <div class="hint">Drag the glass around. In attempt 5, push two shapes together.</div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/liquid-glass.js"></script>
+<script src="assets/glass-gl.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const lab = $('#lab'), bg = $('#bg');
+const { icon } = Page;
+if (LiquidGlass.supported) document.body.classList.add('chromium');
+$('.pill').innerHTML = icon('search') + ' Drag me';
+$('.drop').innerHTML = icon('heart');
+$('.mini').innerHTML = icon('play');
+$('.card .ctrl').innerHTML = icon('backward') + icon('pause') + icon('forward');
+document.querySelectorAll('.obj').forEach(el => Page.draggable(el, { bounds: lab }));
+
+/* ---------- backdrop: photo + text + stripes, painted into a canvas ----------
+   The same pixels serve as the visible background and as the WebGL texture,
+   so every attempt refracts exactly the same scene. */
+const photo = new Image();
+photo.src = 'assets/img/p1043.jpg';
+function paint() {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const W = lab.clientWidth, H = lab.clientHeight;
+  bg.width = W * dpr; bg.height = H * dpr;
+  const c = bg.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (photo.complete && photo.naturalWidth) {
+    const s = Math.max(W / photo.naturalWidth, H / photo.naturalHeight);
+    const w = photo.naturalWidth * s, h = photo.naturalHeight * s;
+    c.drawImage(photo, (W - w) / 2, (H - h) * .35, w, h);
+  } else {
+    c.fillStyle = '#345'; c.fillRect(0, 0, W, H);
+  }
+  const g = c.createLinearGradient(0, 0, W * .7, H);
+  g.addColorStop(0, 'rgba(0,0,0,.45)'); g.addColorStop(.5, 'rgba(0,0,0,0)');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.fillStyle = '#fff';
+  c.font = `800 ${Math.min(96, W / 8)}px Inter, system-ui, sans-serif`;
+  c.textBaseline = 'top';
+  c.fillText('Liquid Glass', 36, 34);
+  c.font = `500 ${Math.min(18, W / 40)}px Inter, system-ui, sans-serif`;
+  const lines = ['A translucent material that reflects and refracts', 'its surroundings, while dynamically transforming', 'to bring greater focus to content.'];
+  lines.forEach((l, i) => c.fillText(l, 38, 34 + Math.min(96, W / 8) * 1.12 + i * 26));
+  // colour chips
+  ['#ff453a', '#ff9f0a', '#ffd60a', '#30d158', '#64d2ff', '#0a84ff', '#bf5af2'].forEach((col, i) => {
+    c.fillStyle = col; c.beginPath(); c.arc(56 + i * 46, H * .43, 16, 0, 7); c.fill();
+  });
+  // stripes block — makes lensing obvious
+  c.save();
+  c.beginPath(); c.roundRect(W * .6, H * .27, W * .34, H * .22, 20); c.clip();
+  for (let x = 0; x < W * .34; x += 10) { c.fillStyle = (x / 10) % 2 ? '#111' : '#f4f4f4'; c.fillRect(W * .6 + x, H * .27, 10, H * .22); }
+  c.restore();
+  c.font = `700 13px Inter, system-ui, sans-serif`;
+  c.fillStyle = 'rgba(255,255,255,.85)';
+  for (let i = 0; i < 6; i++) c.fillText('REFRACTION · LENSING · SPECULAR · ADAPTIVE · ', 38, H - 150 + i * 17);
+  if (gl && gl.ok) gl.uploadSource();
+}
+photo.onload = paint;
+new ResizeObserver(paint).observe(lab);
+
+/* ---------- WebGL renderer ---------- */
+const gl = new GlassGL($('#gl'), bg);
+gl.shapes = () => {
+  const r0 = lab.getBoundingClientRect();
+  return [...document.querySelectorAll('.obj')].map(el => {
+    const r = el.getBoundingClientRect(), k = r.width / el.offsetWidth;
+    const cr = getComputedStyle(el).borderTopLeftRadius;
+    const rad = cr.includes('%') ? parseFloat(cr) / 100 * el.offsetWidth : parseFloat(cr);
+    return { x: r.left - r0.left, y: r.top - r0.top, w: r.width, h: r.height, r: Math.min(rad * k, r.width / 2, r.height / 2) };
+  });
+};
+
+/* ---------- tuning ---------- */
+const P = { bezel: 22, thickness: 26, ior: 1.5, blur: 1, chromatic: 0, specular: .7, magnify: 0, merge: 30 };
+const ranges = [
+  ['bezel', 'Bezel', 4, 60, 1], ['thickness', 'Thickness', 0, 80, 1], ['ior', 'IOR', 1, 2.4, .05],
+  ['blur', 'Frost', 0, 12, .5], ['chromatic', 'Dispersion', 0, .4, .01], ['specular', 'Specular', 0, 1, .05],
+  ['magnify', 'Magnify', 0, .3, .01], ['merge', 'Merge (GL)', 0, 80, 1],
+];
+const tw = $('#tweaks');
+function syncInputs() {
+  tw.innerHTML = ranges.map(([k, label, min, max, step]) =>
+    `<label>${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${P[k]}"><output>${P[k]}</output></label>`).join('');
+  tw.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => {
+    P[inp.dataset.k] = +inp.value;
+    inp.nextElementSibling.textContent = inp.value;
+    applyParams();
+  }));
+}
+function svgOpts() { return { bezel: P.bezel, thickness: P.thickness, ior: P.ior, blur: P.blur, chromatic: P.chromatic, specular: P.specular, magnify: P.magnify, saturate: 1.4 }; }
+function applyParams() {
+  const t = Page.tries[Page.current];
+  if (t.kind === 'snell') document.querySelectorAll('.obj').forEach(el => { const h = LiquidGlass.get(el); if (h) h.update(svgOpts()); });
+  if (t.kind === 'gl') Object.assign(gl.params, { bezel: P.bezel, thickness: P.thickness, ior: P.ior, frost: P.blur, chromatic: P.chromatic, specular: P.specular, magnify: P.magnify, merge: P.merge });
+}
+function preset(p) { Object.assign(P, p); syncInputs(); }
+
+Page.init({
+  title: 'Lens Lab — the material itself',
+  start: 2,
+  tries: [
+    { title: 'Frosted CSS glassmorphism', cls: 't-frost', glass: null,
+      desc: `<p>The 2020-era "glassmorphism": <code>backdrop-filter: blur(18px) saturate(180%)</code>, a 12% white tint and a gradient hairline rim.</p>
+        <ul><li>Works everywhere, cheap.</li><li>Looks like iOS 7–18 frosted panels, <b>not</b> Liquid Glass: no lensing, no edge refraction, the background just goes soft.</li></ul>` },
+    { title: 'SVG turbulence displacement', cls: 't-noise', glass: null,
+      desc: `<p>The approach most "liquid glass CSS" CodePens use: <code>feTurbulence</code> noise, blurred, fed into <code>feDisplacementMap</code> as a backdrop filter.</p>
+        <ul><li>Gives a watery wobble, but the distortion is random. Real glass bends light <b>at the curved rim</b> and leaves the flat middle clear.</li><li>Chromium only.</li></ul>` },
+    { title: 'Snell’s-law displacement map', cls: 't-snell', kind: 'snell',
+      glass: { default: () => svgOpts() },
+      enter() { preset({ bezel: 22, thickness: 26, ior: 1.5, blur: 1, chromatic: 0, specular: .7, magnify: 0 }); applyParams(); },
+      desc: `<p>Closest CSS version of the real thing. For each element a displacement map is <b>computed from physics</b>:</p>
+        <ul><li>Rounded-rect distance field → squircle surface profile in a bezel band near the edge.</li>
+        <li>Surface slope + Snell's law (n = 1.5) → how far each ray shifts sideways.</li>
+        <li>Packed into R/G of an image → <code>feDisplacementMap</code> via <code>backdrop-filter: blur() url(#…)</code>.</li>
+        <li>A second image adds a rim specular highlight lit from the top-left.</li></ul>
+        <p>The centre stays crisp; the edges bend and compress the scene, like Apple's controls.</p>` },
+    { title: 'Lens + dispersion + magnification', cls: 't-snell', kind: 'snell',
+      glass: { default: () => svgOpts() },
+      enter() { preset({ bezel: 34, thickness: 40, ior: 1.6, blur: .5, chromatic: .16, specular: .85, magnify: .08 }); applyParams(); },
+      desc: `<p>Attempt 3 pushed harder, the way the iOS 26 magnifier and slider thumbs look:</p>
+        <ul><li>Wider bezel and thicker glass for heavier lensing.</li>
+        <li><b>Chromatic dispersion</b>: R, G and B are displaced by slightly different amounts, so edges fringe the way real glass does.</li>
+        <li>Slight <b>magnification</b> of the interior.</li></ul>` },
+    { title: 'WebGL shader (physically based)', cls: 't-gl', kind: 'gl', glass: null,
+      enter() { preset({ bezel: 24, thickness: 30, ior: 1.5, blur: 1.5, chromatic: .1, specular: .8, magnify: .05, merge: 30 }); applyParams(); gl.start(); },
+      exit() { gl.stop(); },
+      desc: `<p>The whole scene is one fragment shader, so it can do what CSS can't:</p>
+        <ul><li>Same Snell's-law refraction, computed per pixel on the GPU.</li>
+        <li>Frosted blur from texture mipmaps, per-channel dispersion, Fresnel rim, crisp edge highlight and a soft drop shadow.</li>
+        <li><b>Shapes melt together</b> when pushed close (smooth-min of distance fields), like SwiftUI's <code>GlassEffectContainer</code> morphing.</li>
+        <li>Works in every WebGL2 browser, Firefox and Safari included.</li></ul>
+        <p>Catch: the glass can only refract what's painted into its texture.</p>` },
+  ],
+});
+syncInputs();
+</script>
+</body>
+</html>
