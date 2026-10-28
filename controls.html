@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass Controls</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .board { position: relative; width: 100%; min-height: clamp(560px, calc(100vh - 130px), 760px); border-radius: 28px; overflow: hidden; isolation: isolate;
+    background: url(assets/img/p1080.jpg) center 40%/cover; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 .5px var(--line);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-content: center; gap: 48px 24px; padding: 48px 28px; }
+  .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 150px; }
+  .cap { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.35); padding: 4px 10px; border-radius: 999px; }
+
+  /* lens thumb shared by switch + slider */
+  .thumb { position: absolute; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); --blur: 0px; --sat: 100%;
+    transition: transform .45s cubic-bezier(.3,1.5,.4,1), background .25s, left .3s cubic-bezier(.3,1.3,.4,1); }
+  .thumb::before { opacity: 0; transition: opacity .25s; }
+  .thumb.lens { background: rgba(255,255,255,.06); box-shadow: 0 6px 18px rgba(0,0,0,.2); transition: transform .35s cubic-bezier(.3,1.6,.4,1), background .25s; }
+  .thumb.lens::before { opacity: 1; }
+
+  /* switch */
+  .switch { position: relative; width: 64px; height: 28px; border-radius: 14px; background: rgba(120,120,128,.4); cursor: pointer; touch-action: none; transition: background .3s; transform: scale(1.6); }
+  .switch.on { background: #34c759; }
+  .switch .thumb { top: 2px; left: 2px; width: 38px; height: 24px; border-radius: 12px; }
+  .switch.on .thumb { left: 24px; }
+  .switch .thumb.lens { transform: scale(1.45, 1.55); }
+
+  /* slider */
+  .slider { position: relative; width: 260px; height: 30px; cursor: pointer; touch-action: none; }
+  .slider .track { position: absolute; left: 0; right: 0; top: 12px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.35); overflow: hidden; }
+  .slider .track i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--v) * 100%); background: #0a84ff; }
+  .slider .thumb { top: 3px; left: calc(var(--v) * (100% - 38px)); width: 38px; height: 24px; border-radius: 12px; transition: transform .45s cubic-bezier(.3,1.5,.4,1), background .25s; }
+  .slider .thumb.lens { transform: scale(1.7, 1.75); }
+
+  /* segmented */
+  .seg { position: relative; display: flex; width: 300px; height: 44px; border-radius: 22px; padding: 3px; touch-action: none; cursor: pointer; }
+  .seg button { flex: 1; position: relative; z-index: 1; font-size: 15px; font-weight: 600; border-radius: 19px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.3); }
+  .seg .ind { position: absolute; z-index: 2; top: 3px; bottom: 3px; border-radius: 19px; pointer-events: none; --tint: rgba(255,255,255,.22); --shadow: 0 2px 8px rgba(0,0,0,.15); --blur: 0px; --sat: 100%;
+    transition: left .45s cubic-bezier(.3,1.25,.4,1), transform .4s cubic-bezier(.3,1.5,.4,1), background .25s; }
+  .seg .ind.lens { transform: scale(1.18, 1.3); --tint: rgba(255,255,255,.03); transition: transform .35s cubic-bezier(.3,1.6,.4,1); }
+
+  /* buttons */
+  .btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; align-items: center; }
+  .gbtn { height: 50px; padding: 0 24px; border-radius: 25px; font-size: 17px; font-weight: 600; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.3); overflow: hidden;
+    transition: transform .5s cubic-bezier(.25,1.6,.4,1); }
+  .gbtn.prom { --tint: rgba(10,132,255,.72) !important; text-shadow: none; }
+  .gbtn.circle { width: 50px; padding: 0; display: grid; place-items: center; font-size: 21px; }
+  .gbtn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s;
+    background: radial-gradient(120px circle at var(--px, 50%) var(--py, 50%), rgba(255,255,255,.35), transparent 60%); }
+  .gbtn.pressed { transform: scale(1.12); }
+  .gbtn.pressed::after { opacity: 1; }
+
+  .toolbar { display: flex; border-radius: 26px; height: 52px; align-items: center; padding: 0 6px; }
+  .toolbar button { width: 48px; height: 44px; display: grid; place-items: center; font-size: 21px; color: #fff; filter: drop-shadow(0 1px 4px rgba(0,0,0,.3)); }
+  .toolbar .sep { width: .5px; height: 24px; background: rgba(255,255,255,.35); }
+
+  /* morphing menu */
+  .menu-host { position: relative; width: 240px; height: 230px; display: flex; justify-content: flex-end; align-items: flex-start; }
+  .menu { position: relative; width: 50px; height: 50px; border-radius: 25px; overflow: hidden; cursor: pointer; color: #fff;
+    transition: width .55s cubic-bezier(.3,1.2,.4,1), height .55s cubic-bezier(.3,1.2,.4,1), border-radius .55s; }
+  .menu .dots { position: absolute; top: 0; right: 0; width: 50px; height: 50px; display: grid; place-items: center; font-size: 21px; transition: opacity .2s; }
+  .menu ul { list-style: none; margin: 0; padding: 8px; opacity: 0; transition: opacity .2s; width: 240px; }
+  .menu li { display: flex; justify-content: space-between; align-items: center; padding: 11px 12px; border-radius: 12px; font-size: 16px; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,.35); }
+  .menu li:hover { background: rgba(255,255,255,.12); }
+  .menu li .i { font-size: 18px; }
+  .menu.open { width: 240px; height: 222px; border-radius: 30px; }
+  .menu.open .dots { opacity: 0; }
+  .menu.open ul { opacity: 1; transition: opacity .3s .18s; }
+
+  /* materials */
+  .m-css .glass { --tint: rgba(255,255,255,.16); --blur: 16px; --sat: 180%; }
+  .m-css .thumb.lens, .m-css .ind.lens { --blur: 2px; }
+  .m-lg .glass, .m-motion .glass { --tint: rgba(255,255,255,.06); }
+  .thumb:not(.lens) { background: #fff !important; }
+</style>
+</head>
+<body>
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">Interact</div>
+      <ul>
+        <li><b>Hold</b> the switch or slider thumb: it swells into a clear lens that magnifies the track. Drag it, then let go.</li>
+        <li>Drag across the segmented control: the indicator turns into a droplet.</li>
+        <li>Press the buttons: glass grows and glows at the touch point.</li>
+        <li>The <b>…</b> button morphs into a menu; the refraction map is rebuilt every frame as it changes shape.</li>
+      </ul>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="board">
+      <div class="cell"><div class="switch on" id="sw"><div class="thumb glass" data-glass="thumb"></div></div><div class="cap">Toggle</div></div>
+      <div class="cell"><div class="slider" id="sl" style="--v:.45"><div class="track"><i></i></div><div class="thumb glass" data-glass="thumb"></div></div><div class="cap">Slider</div></div>
+      <div class="cell"><div class="seg glass" data-glass="bar" id="seg"><button>Day</button><button>Week</button><button>Month</button><div class="ind glass" data-glass="ind"></div></div><div class="cap">Segmented</div></div>
+      <div class="cell"><div class="btns" id="btns"></div><div class="cap">Buttons</div></div>
+      <div class="cell"><div class="toolbar glass" data-glass="bar" id="tb"></div><div class="cap">Grouped toolbar</div></div>
+      <div class="cell"><div class="menu-host"><div class="menu glass" data-glass="menu" id="menu"><div class="dots"></div><ul id="menuList"></ul></div></div><div class="cap">Morphing menu</div></div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/liquid-glass.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const { icon } = Page;
+
+$('#btns').innerHTML = `<button class="gbtn glass" data-glass="btn">Glass</button><button class="gbtn glass prom" data-glass="btn">Prominent</button>
+  <button class="gbtn glass circle" data-glass="btn">${icon('heart')}</button><button class="gbtn glass circle" data-glass="btn">${icon('plus')}</button>`;
+$('#tb').innerHTML = `<button>${icon('chevronLeft')}</button><span class="sep"></span><button>${icon('star')}</button><button>${icon('search')}</button><span class="sep"></span><button>${icon('ellipsis')}</button>`;
+$('#menu .dots').innerHTML = icon('ellipsis');
+$('#menuList').innerHTML = [['Share', 'plus'], ['Favorite', 'star'], ['Duplicate', 'stack'], ['Settings', 'gear']].map(([t, i]) => `<li>${t}${icon(i)}</li>`).join('');
+$('#menu').addEventListener('click', e => { if (!e.target.closest('li') || $('#menu').classList.contains('open')) $('#menu').classList.toggle('open'); });
+document.addEventListener('pointerdown', e => { if (!e.target.closest('#menu')) $('#menu').classList.remove('open'); });
+
+/* lens on/off for thumbs and indicators */
+function lensOn(el) {
+  el.classList.add('lens');
+  const h = LiquidGlass.get(el);
+  const t = Page.tries[Page.current];
+  if (h && t.lens) h.update(t.lens);
+}
+function lensOff(el) {
+  el.classList.remove('lens');
+  const h = LiquidGlass.get(el);
+  const t = Page.tries[Page.current];
+  if (h && t.glass) h.update(t.glass[el.dataset.glass] || t.glass.default);
+}
+
+/* switch */
+const sw = $('#sw'), swt = sw.querySelector('.thumb');
+let swDown = null;
+sw.addEventListener('pointerdown', e => { swDown = { x: e.clientX, moved: false }; sw.setPointerCapture(e.pointerId); lensOn(swt); });
+sw.addEventListener('pointermove', e => {
+  if (!swDown) return;
+  const r = sw.getBoundingClientRect(), k = r.width / sw.offsetWidth;
+  const x = (e.clientX - r.left) / k - 19;
+  if (Math.abs(e.clientX - swDown.x) > 3) swDown.moved = true;
+  if (swDown.moved) { swt.style.transition = 'transform .35s cubic-bezier(.3,1.6,.4,1), background .25s'; swt.style.left = Math.max(2, Math.min(24, x)) + 'px'; }
+});
+const swUp = e => {
+  if (!swDown) return;
+  const left = parseFloat(swt.style.left || (sw.classList.contains('on') ? 24 : 2));
+  const on = swDown.moved ? left > 13 : !sw.classList.contains('on');
+  swDown = null;
+  swt.style.transition = ''; swt.style.left = '';
+  sw.classList.toggle('on', on);
+  setTimeout(() => lensOff(swt), 120);
+};
+sw.addEventListener('pointerup', swUp); sw.addEventListener('pointercancel', swUp);
+
+/* slider */
+const sl = $('#sl'), slt = sl.querySelector('.thumb');
+let slDown = false;
+const slSet = e => { const r = sl.getBoundingClientRect(); sl.style.setProperty('--v', Math.max(0, Math.min(1, (e.clientX - r.left - 19) / (r.width - 38))).toFixed(3)); };
+sl.addEventListener('pointerdown', e => { slDown = true; sl.setPointerCapture(e.pointerId); lensOn(slt); slSet(e); });
+sl.addEventListener('pointermove', e => { if (slDown) slSet(e); });
+const slUp = () => { if (!slDown) return; slDown = false; lensOff(slt); };
+sl.addEventListener('pointerup', slUp); sl.addEventListener('pointercancel', slUp);
+
+/* segmented */
+const seg = $('#seg'), ind = seg.querySelector('.ind'), segBtns = [...seg.querySelectorAll('button')];
+let segI = 1, segDown = false;
+function segPlace(i) { const b = segBtns[i]; ind.style.left = b.offsetLeft + 'px'; ind.style.width = b.offsetWidth + 'px'; }
+segPlace(segI);
+seg.addEventListener('pointerdown', e => { segDown = true; seg.setPointerCapture(e.pointerId); lensOn(ind); segMove(e); });
+function segMove(e) {
+  if (!segDown) return;
+  const r = seg.getBoundingClientRect(), w = ind.offsetWidth;
+  ind.style.transition = 'transform .35s cubic-bezier(.3,1.6,.4,1)';
+  ind.style.left = Math.max(3, Math.min(r.width - 3 - w, e.clientX - r.left - w / 2)) + 'px';
+}
+seg.addEventListener('pointermove', segMove);
+const segUp = e => {
+  if (!segDown) return;
+  segDown = false;
+  const r = seg.getBoundingClientRect(), x = e.clientX - r.left;
+  segI = segBtns.reduce((best, b, i) => Math.abs(b.offsetLeft + b.offsetWidth / 2 - x) < Math.abs(segBtns[best].offsetLeft + segBtns[best].offsetWidth / 2 - x) ? i : best, 0);
+  ind.style.transition = '';
+  segPlace(segI);
+  lensOff(ind);
+};
+seg.addEventListener('pointerup', segUp); seg.addEventListener('pointercancel', segUp);
+
+/* buttons: grow + glow at the touch point */
+document.querySelectorAll('.gbtn').forEach(b => {
+  b.addEventListener('pointerdown', e => {
+    const r = b.getBoundingClientRect();
+    b.style.setProperty('--px', (e.clientX - r.left) + 'px'); b.style.setProperty('--py', (e.clientY - r.top) + 'px');
+    b.classList.add('pressed');
+  });
+  b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.setProperty('--px', (e.clientX - r.left) / (r.width / b.offsetWidth) + 'px'); b.style.setProperty('--py', (e.clientY - r.top) / (r.height / b.offsetHeight) + 'px'); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => b.classList.remove('pressed')));
+});
+
+/* attempt 3: highlights follow the pointer */
+let relight = 0;
+Page.motionLight(a => {
+  const t = Page.tries[Page.current];
+  if (!t.relight) return;
+  clearTimeout(relight);
+  relight = setTimeout(() => document.querySelectorAll('[data-glass]').forEach(el => {
+    if (el.classList.contains('lens')) return;
+    const h = LiquidGlass.get(el); if (h) h.update({ lightAngle: Page.cssAngleToLight(a) });
+  }), 100);
+});
+
+const base = { bezel: 16, thickness: 18, blur: 2, saturate: 1.6, specular: .75 };
+const thumbRest = { bezel: 10, thickness: 10, blur: 0, saturate: 1.2, specular: .4 };
+Page.init({
+  title: 'Glass Controls',
+  start: 1,
+  tries: [
+    { title: 'Frosted CSS controls', cls: 'm-css', glass: null,
+      desc: `<p>Every control is a CSS <code>backdrop-filter</code> panel with the gradient rim. Same shapes and the same spring animations as the other attempts.</p>
+        <ul><li>When pressed, the thumbs and indicator turn translucent but can't magnify: CSS has no way to bend the backdrop.</li></ul>` },
+    { title: 'Liquid Glass controls', cls: 'm-lg',
+      glass: { default: base, thumb: thumbRest, ind: { ...thumbRest, bezel: 12 }, menu: { ...base, bezel: 20, thickness: 22 }, btn: { ...base, bezel: 14 } },
+      lens: { bezel: 9, thickness: 14, ior: 1.6, blur: 0, magnify: .22, saturate: 1.3, specular: .9 },
+      desc: `<p>Refraction on every surface, and the iOS 26 interaction model:</p>
+        <ul><li>At rest, switch and slider thumbs are solid white capsules. <b>On touch they become a lens</b>: the white fades, the shape swells ~1.5×, and a magnifying displacement map is applied so the track shows through, enlarged.</li>
+        <li>The segmented indicator does the same over the labels. It sits <i>above</i> them in the DOM so its backdrop contains them.</li>
+        <li>The menu's map is rebuilt on every ResizeObserver tick while it morphs.</li></ul>` },
+    { title: 'Liquid Glass + motion & dispersion', cls: 'm-motion', relight: true,
+      glass: { default: { ...base, chromatic: .06 }, thumb: thumbRest, ind: { ...thumbRest, bezel: 12 }, menu: { ...base, bezel: 22, thickness: 24, chromatic: .06 }, btn: { ...base, bezel: 14, chromatic: .05 } },
+      lens: { bezel: 10, thickness: 18, ior: 1.7, blur: 0, magnify: .26, saturate: 1.35, specular: 1, chromatic: .18 },
+      desc: `<p>Attempt 2 plus the two details that make Apple's version feel physical:</p>
+        <ul><li><b>Moving light</b>: specular maps are re-rendered from the pointer position (from device tilt on phones), so highlights slide around the rims.</li>
+        <li><b>Dispersion</b> in the lenses: colour fringes at the edge of a pressed thumb.</li></ul>` },
+  ],
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Floating Tab Bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .phone { --accent: #ff375f; background: #000; }
+  .scroller { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; padding: 58px 0 180px; }
+  .scroller::-webkit-scrollbar { display: none; }
+  .head { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px 4px; }
+  .head h1 { margin: 0; font-size: 34px; font-weight: 750; letter-spacing: -.03em; }
+  .circle-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; }
+  h3 { margin: 22px 20px 10px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; display: flex; align-items: center; gap: 4px; }
+  h3 .i { font-size: 15px; opacity: .45; }
+  .hero { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  .hero::-webkit-scrollbar { display: none; }
+  .hero .c { flex: none; width: 290px; height: 360px; border-radius: 22px; background-size: cover; background-position: center; position: relative; overflow: hidden; scroll-snap-align: center; }
+  .hero .c::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(0,0,0,.75)); }
+  .hero .c div { position: absolute; z-index: 1; left: 16px; right: 16px; bottom: 16px; }
+  .hero .c small { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; opacity: .7; font-weight: 600; }
+  .hero .c b { font-size: 22px; letter-spacing: -.02em; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 20px; }
+  .tile .art { aspect-ratio: 1; border-radius: 12px; background-size: cover; background-position: center; }
+  .tile b { display: block; margin-top: 7px; font-size: 14px; font-weight: 600; }
+  .tile span { font-size: 13px; color: rgba(235,235,245,.6); }
+  .rows { padding: 0 20px; }
+  .rowi { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: .5px solid rgba(84,84,88,.5); }
+  .rowi .art { width: 48px; height: 48px; border-radius: 8px; background-size: cover; background-position: center; flex: none; }
+  .rowi b { display: block; font-size: 15px; font-weight: 550; }
+  .rowi span { font-size: 13px; color: rgba(235,235,245,.6); }
+  .rowi .i { margin-left: auto; color: rgba(235,235,245,.6); }
+
+  /* iOS 26 scroll-edge effect: progressive blur + fade under the status bar */
+  .edge { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: 110px; pointer-events: none;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,0));
+    -webkit-mask: linear-gradient(#000 45%, transparent); mask: linear-gradient(#000 45%, transparent); opacity: 0; transition: opacity .3s; }
+  .scrolled .edge { opacity: 1; }
+  .inline-title { position: absolute; z-index: 30; top: 58px; left: 0; right: 0; text-align: center; font-weight: 650; font-size: 17px; opacity: 0; transform: translateY(6px); transition: .3s; pointer-events: none; }
+  .scrolled .inline-title { opacity: 1; transform: none; }
+  .float-btn { position: absolute; z-index: 30; top: 52px; right: 16px; opacity: 0; transition: .3s; }
+  .scrolled .float-btn { opacity: 1; }
+
+  /* ---------- bottom controls ---------- */
+  .bar, .mini, .searchbtn { position: absolute; z-index: 40; transition: left .55s cubic-bezier(.3,1.25,.4,1), right .55s cubic-bezier(.3,1.25,.4,1), bottom .55s cubic-bezier(.3,1.25,.4,1), width .55s cubic-bezier(.3,1.25,.4,1); }
+  .bar { left: 14px; right: 88px; bottom: 24px; height: 64px; border-radius: 32px; }
+  .searchbtn { right: 14px; bottom: 24px; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; }
+  .mini { left: 14px; right: 14px; bottom: 98px; height: 54px; border-radius: 27px; display: flex; align-items: center; gap: 10px; padding: 0 14px 0 8px; }
+  .mini .art { width: 38px; height: 38px; border-radius: 9px; background: url(assets/img/p1069.jpg) center/cover; flex: none; }
+  .mini .t { flex: 1; min-width: 0; font-size: 14.5px; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini button { font-size: 20px; padding: 6px; }
+  .tabs { position: absolute; inset: 4px; display: flex; transition: opacity .25s; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 600; color: #fff; border-radius: 28px; }
+  .tab .i { font-size: 23px; }
+  .tab.on { color: var(--accent); }
+  .collapsed { position: absolute; inset: 0; display: grid; place-items: center; font-size: 24px; color: var(--accent); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  /* selection droplet: sits above the tabs so, as a lens, it refracts them */
+  .sel { position: absolute; z-index: 2; top: 4px; bottom: 4px; left: 4px; border-radius: 28px; pointer-events: none;
+    --tint: rgba(255,255,255,.12); --shadow: none; --blur: 0px; --sat: 100%;
+    transition: transform .5s cubic-bezier(.3,1.4,.4,1), left .5s cubic-bezier(.3,1.25,.4,1), background .3s, opacity .25s; }
+  .sel.lens { transform: scale(1.32, 1.22); --tint: rgba(255,255,255,.02); transition: transform .35s cubic-bezier(.3,1.5,.4,1), background .3s; }
+  .sel:not(.lens)::before { opacity: 0; }
+
+  .min .bar { right: calc(100% - 14px - 64px); }
+  .min .tabs, .min .sel { opacity: 0; }
+  .min .collapsed { opacity: 1; }
+  .min .mini { left: 88px; right: 88px; bottom: 24px; height: 64px; border-radius: 32px; }
+
+  /* ---------- materials per try ---------- */
+  .m-frost .glass { --tint: rgba(30,30,32,.62); --blur: 22px; --sat: 180%; --rim: .55; }
+  .m-regular .glass { --tint: rgba(18,18,20,.28); --rim: .8; }
+  .m-clear .glass { --tint: rgba(0,0,0,.16); --rim: 1; }
+  .m-clear .bar .tab:not(.on), .m-clear .mini, .m-clear .searchbtn { text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+  .m-frost .sel, .m-regular .sel, .m-clear .sel { --tint: rgba(255,255,255,.12); }
+  .sel.lens { --tint: rgba(255,255,255,.03) !important; }
+</style>
+</head>
+<body>
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">Interact</div>
+      <ul>
+        <li><b>Scroll down</b>: the tab bar minimises into a single droplet and the mini-player slides inline; scroll up to restore.</li>
+        <li><b>Press and drag across the tabs</b>: the selection turns into a clear lens that magnifies the icons beneath it, then snaps.</li>
+        <li>The top edge uses iOS 26's soft scroll-edge blur instead of a solid bar.</li>
+      </ul>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="phone" id="phone">
+      <div class="screen">
+        <div class="scroller" id="scroller">
+          <div class="head"><h1>Home</h1><button class="circle-btn glass press" data-glass="bar" id="profile"></button></div>
+          <h3>Top Picks for You</h3>
+          <div class="hero" id="hero"></div>
+          <h3>Recently Played <span id="chev"></span></h3>
+          <div class="grid2" id="grid"></div>
+          <h3>Made for You</h3>
+          <div class="rows" id="rows"></div>
+        </div>
+        <div class="edge"></div>
+        <div class="inline-title">Home</div>
+        <button class="circle-btn glass press float-btn" data-glass="bar" id="profile2"></button>
+        <div class="mini glass" data-glass="bar"><div class="art"></div><div class="t">Midnight Drift — Tidal Lights</div><button id="pp"></button><button id="ff"></button></div>
+        <div class="bar glass" data-glass="bar" id="bar">
+          <div class="tabs" id="tabs"></div>
+          <div class="sel glass" data-glass="lens" id="sel"></div>
+          <div class="collapsed" id="collapsed"></div>
+        </div>
+        <button class="searchbtn glass press" data-glass="bar" id="search"></button>
+        <div class="island"></div>
+        <div id="sb"></div>
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/liquid-glass.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const { icon } = Page;
+const imgs = ['p1015', 'p1018', 'p1036', 'p1043', 'p1050', 'p1069', 'p1074', 'p1080'].map(n => `assets/img/${n}.jpg`);
+$('#sb').innerHTML = Page.statusBar();
+$('#profile').innerHTML = $('#profile2').innerHTML = icon('person');
+$('#search').innerHTML = icon('search');
+$('#pp').innerHTML = icon('play'); $('#ff').innerHTML = icon('forward');
+$('#chev').innerHTML = icon('chevronRight');
+$('#pp').onclick = () => { const p = $('#pp').dataset.p !== '1'; $('#pp').dataset.p = p ? '1' : ''; $('#pp').innerHTML = icon(p ? 'pause' : 'play'); };
+
+const titles = [['Station', 'Northern Lights Radio'], ['New Release', 'Glass Houses'], ['Playlist', 'Alpine Focus'], ['Mix', 'Granite & Pine'], ['Station', 'Coastal Hours'], ['Album', 'Jelly Bloom'], ['Playlist', 'Wild Calm'], ['Mix', 'Summer Fruit']];
+$('#hero').innerHTML = imgs.slice(0, 5).map((u, i) => `<div class="c" style="background-image:url(${u})"><div><small>${titles[i][0]}</small><b>${titles[i][1]}</b></div></div>`).join('');
+$('#grid').innerHTML = imgs.map((u, i) => `<div class="tile"><div class="art" style="background-image:url(${u});background-position:${20 + i * 9}% ${30 + i * 5}%"></div><b>${titles[i][1]}</b><span>Various Artists</span></div>`).join('');
+$('#rows').innerHTML = imgs.concat(imgs).map((u, i) => `<div class="rowi"><div class="art" style="background-image:url(${u})"></div><div><b>${titles[i % 8][1]}</b><span>Song · Tidal Lights</span></div>${icon('ellipsis')}</div>`).join('');
+
+/* ---------- tabs ---------- */
+const TABS = [['house', 'Home'], ['grid', 'New'], ['radio', 'Radio'], ['stack', 'Library']];
+let active = 0;
+$('#tabs').innerHTML = TABS.map(([ic, l], i) => `<button class="tab" data-i="${i}">${icon(ic)}<span>${l}</span></button>`).join('');
+const bar = $('#bar'), sel = $('#sel'), tabsEl = $('#tabs');
+function tabRect(i) { const t = tabsEl.children[i]; return { left: t.offsetLeft + 4, width: t.offsetWidth }; }
+function select(i) {
+  active = i;
+  [...tabsEl.children].forEach((t, j) => t.classList.toggle('on', j === i));
+  const r = tabRect(i);
+  sel.style.left = r.left + 'px'; sel.style.width = r.width + 'px';
+  $('#collapsed').innerHTML = icon(TABS[i][0]);
+}
+new ResizeObserver(() => select(active)).observe(bar);
+
+// press-and-drag: selection becomes a magnifying lens that follows the finger
+let dragging = false;
+bar.addEventListener('pointerdown', e => {
+  if (phone.classList.contains('min')) { phone.classList.remove('min'); return; }
+  dragging = true;
+  bar.setPointerCapture(e.pointerId);
+  sel.classList.add('lens');
+  const h = LiquidGlass.get(sel); if (h) h.update({ magnify: .18, thickness: 30, bezel: 18, blur: 0, chromatic: .08, specular: .9 });
+  move(e);
+});
+function move(e) {
+  if (!dragging) return;
+  const br = bar.getBoundingClientRect(), w = sel.offsetWidth;
+  const x = Math.max(4, Math.min(br.width - 4 - w, e.clientX - br.left - w / 2));
+  sel.style.transition = 'transform .35s cubic-bezier(.3,1.5,.4,1)';
+  sel.style.left = x + 'px';
+}
+bar.addEventListener('pointermove', move);
+const release = e => {
+  if (!dragging) return;
+  dragging = false;
+  sel.style.transition = '';
+  const br = bar.getBoundingClientRect();
+  const x = e.clientX - br.left;
+  let best = 0, bd = 1e9;
+  [...tabsEl.children].forEach((t, i) => { const d = Math.abs(t.offsetLeft + t.offsetWidth / 2 - x); if (d < bd) { bd = d; best = i; } });
+  sel.classList.remove('lens');
+  const t = Page.tries[Page.current];
+  const h = LiquidGlass.get(sel); if (h && t.glass) h.update(t.glass.lens);
+  select(best);
+};
+bar.addEventListener('pointerup', release);
+bar.addEventListener('pointercancel', release);
+
+/* ---------- scroll: edge title + minimise ---------- */
+const phone = $('#phone'), scroller = $('#scroller');
+let lastY = 0;
+scroller.addEventListener('scroll', () => {
+  const y = scroller.scrollTop;
+  phone.classList.toggle('scrolled', y > 40);
+  if (y > 120 && y > lastY + 4) phone.classList.add('min');
+  else if (y < lastY - 6 || y < 60) phone.classList.remove('min');
+  lastY = y;
+}, { passive: true });
+
+select(0);
+const lensRest = { bezel: 14, thickness: 14, blur: 0, specular: .5, saturate: 1.2 };
+Page.init({
+  title: 'Floating Tab Bar — iOS 26',
+  start: 1,
+  tries: [
+    { title: 'Frosted material (pre-iOS 26)', cls: 'm-frost', glass: null,
+      desc: `<p>The same floating layout, but rendered with the old UIKit-style material: <code>blur(22px) saturate(180%)</code> over a 62% dark tint.</p>
+        <ul><li>Reads as a solid grey slab; content under it turns to mush.</li><li>This is what most "iOS-style" web UIs ship today.</li></ul>` },
+    { title: 'Liquid Glass — Regular', cls: 'm-regular',
+      glass: { default: { bezel: 16, thickness: 18, blur: 3, saturate: 1.7, brightness: .92, specular: .75 }, lens: lensRest },
+      desc: `<p>Apple's default variant for bars: light frost, strong saturation and refraction at the rim.</p>
+        <ul><li>Per-element Snell's-law displacement map, regenerated as the bar morphs (ResizeObserver).</li>
+        <li>Slight darkening (<code>brightness .92</code>) so white glyphs stay legible over bright art. Apple adapts this automatically.</li>
+        <li>Colourful album art shows through, bent at the edges.</li></ul>` },
+    { title: 'Liquid Glass — Clear', cls: 'm-clear',
+      glass: { default: { bezel: 20, thickness: 24, blur: .5, saturate: 1.4, brightness: .96, specular: .9, chromatic: .05 }, lens: lensRest },
+      desc: `<p>The more transparent variant Apple uses over media. Almost no frost, so the lensing does all the work.</p>
+        <ul><li>Thicker glass, near-zero blur, a hint of dispersion.</li>
+        <li>Glyphs get a soft shadow for legibility (Apple uses a dimming layer for the same reason).</li>
+        <li>Closest to the look of iOS 26.0 before the 26.1 "Tinted" option.</li></ul>` },
+  ],
+});
+</script>
+</body>
+</html>

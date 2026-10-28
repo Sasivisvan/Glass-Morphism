@@ -104,6 +104,13 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .home-indicator { position: absolute; z-index: 150; bottom: 8px; left: 50%; transform: translateX(-50%); width: 140px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .9); pointer-events: none; }
 .wallpaper { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
+/* ---------- home screen ---------- */
+.home-grid { position: absolute; top: 72px; left: 22px; right: 22px; display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 22px; }
+.app { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.app span { font-size: 11.5px; font-weight: 500; text-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+.app-ic { width: 62px; height: 62px; border-radius: 15px; display: grid; place-items: center; font-size: 32px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 -1px 0 rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15); }
+.home-dock { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 92px; border-radius: 38px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px; }
+
 /* ---------- glass base ----------
    Every glass element gets a rim highlight (::before) and inner light
    (box-shadow). The material itself — the backdrop — comes from the
@@ -113,7 +120,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   --tint: rgba(255, 255, 255, .08);
   --rim: 1;
   --shadow: 0 8px 28px rgba(0, 0, 0, .22);
-  position: relative;
   background: var(--tint);
   box-shadow: var(--shadow),
     inset 0 .5px 0 rgba(255, 255, 255, calc(.45 * var(--rim))),
@@ -137,6 +143,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
 .glass.dark { --tint: rgba(0, 0, 0, .22); }
+/* zero specificity so any layout class can make a glass element absolute */
+:where(.glass) { position: relative; }
 
 /* hover/press response shared by interactive glass */
 .press { transition: transform .45s cubic-bezier(.2, 1.4, .4, 1), filter .3s; }

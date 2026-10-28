@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* the home screen behind Control Center, blurred and dimmed per try */
+  .behind { position: absolute; inset: 0; transition: filter .5s; }
+  .behind .wallpaper { background-image: url(assets/img/p1015.jpg); }
+  .dim { position: absolute; inset: 0; background: #000; opacity: var(--dim, .4); transition: opacity .5s; }
+
+  .cc { position: absolute; inset: 0; z-index: 10; padding: 64px 26px 0; }
+  .cc-top { display: flex; justify-content: space-between; margin-bottom: 18px; }
+  .cc-top button { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+  .cc-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 74px; gap: 16px; }
+  .m { border-radius: 37px; color: #fff; display: grid; place-items: center; font-size: 26px; transform-origin: center;
+    animation: pop .6s cubic-bezier(.25, 1.4, .4, 1) both; animation-delay: calc(var(--n, 0) * 25ms); }
+  @keyframes pop { from { transform: scale(.7) translateY(-30px); opacity: 0; } }
+  .m.w2 { grid-column: span 2; } .m.h2 { grid-row: span 2; }
+  .m.sq { border-radius: 38px; }
+
+  .conn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; place-items: center; }
+  .tg { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 25px;
+    background: rgba(255,255,255,.14); transition: background .25s, color .25s, transform .4s cubic-bezier(.3,1.6,.4,1); }
+  .tg:active { transform: scale(.9); }
+  .tg.on[data-c=orange] { background: #ff9f0a; }
+  .tg.on[data-c=green] { background: #30d158; }
+  .tg.on[data-c=blue] { background: #0a84ff; }
+  .m.tg1 { cursor: pointer; transition: background .25s, color .25s; }
+  .m.tg1.on { background: rgba(255,255,255,.94) !important; color: #111; }
+
+  .np { display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; padding: 16px; place-items: initial; }
+  .np .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .np .art { width: 50px; height: 50px; border-radius: 11px; background: url(assets/img/p1069.jpg) center/cover; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+  .np .top .i { font-size: 20px; opacity: .85; }
+  .np b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .np span { font-size: 13px; opacity: .6; }
+  .np .ctl { display: flex; justify-content: space-between; align-items: center; font-size: 24px; padding: 0 6px; }
+  .np .ctl button { padding: 2px; }
+
+  .slider { position: relative; overflow: hidden; cursor: ns-resize; touch-action: none; place-items: end center; padding-bottom: 20px; }
+  .slider .fill { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--v) * 100%); background: rgba(255,255,255,.95); border-radius: 0; transition: height .12s; }
+  .slider .i { position: relative; z-index: 1; font-size: 28px; color: #fff; mix-blend-mode: difference; }
+  .slider.active { transform: scaleX(1.08) scaleY(1.04); transition: transform .4s cubic-bezier(.3,1.5,.4,1); }
+  .slider:not(.active) { transition: transform .5s cubic-bezier(.3,1.5,.4,1); }
+
+  .focus { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding: 0 12px; font-size: 16px; font-weight: 600; place-items: initial; }
+  .focus .tg { width: 50px; height: 50px; font-size: 22px; }
+
+  /* ---------- materials per try ---------- */
+  .m-ios18 .behind { filter: blur(26px) saturate(1.3); }
+  .m-ios18 { --dim: .48; }
+  .m-ios18 .glass { --tint: rgba(36,36,40,.5); --blur: 30px; --sat: 160%; --rim: .25; --shadow: none; }
+  .m-ios18 .m { border-radius: 22px; } .m-ios18 .m.circ { border-radius: 50%; } .m-ios18 .slider { border-radius: 22px; }
+
+  .m-clear .behind { filter: blur(7px) saturate(1.2); }
+  .m-clear { --dim: .3; }
+  .m-clear .glass { --tint: rgba(255,255,255,.05); --rim: 1; --shadow: 0 6px 20px rgba(0,0,0,.18); }
+  .m-clear .tg:not(.on) { background: rgba(255,255,255,.1); }
+
+  .m-tinted .behind { filter: blur(12px) saturate(1.2); }
+  .m-tinted { --dim: .42; }
+  .m-tinted .glass { --tint: rgba(58,58,64,.46); --rim: .7; --shadow: 0 6px 20px rgba(0,0,0,.2); }
+</style>
+</head>
+<body>
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">Interact</div>
+      <ul>
+        <li>Tap any toggle; drag the brightness and volume sliders.</li>
+        <li>Move the pointer around the page: the rim highlights follow it, standing in for the gyroscope-driven highlights on a real iPhone.</li>
+      </ul>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="phone">
+      <div class="screen">
+        <div class="behind"><div class="wallpaper"></div><div id="home"></div></div>
+        <div class="dim"></div>
+        <div class="cc">
+          <div class="cc-top"><button class="glass m circ" data-glass="small" id="plus"></button><button class="glass m circ" data-glass="small" id="power"></button></div>
+          <div class="cc-grid" id="grid"></div>
+        </div>
+        <div class="island"></div>
+        <div id="sb"></div>
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/liquid-glass.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const { icon } = Page;
+$('#sb').innerHTML = Page.statusBar();
+$('#home').innerHTML = Page.homeScreen();
+$('#plus').innerHTML = icon('plus');
+$('#power').innerHTML = icon('power');
+
+const tg = (ic, c, on) => `<button class="tg ${on ? 'on' : ''}" data-c="${c}">${icon(ic)}</button>`;
+$('#grid').innerHTML = `
+  <div class="glass m w2 h2 sq conn" data-glass="big" style="--n:1">${tg('airplane', 'orange', false)}${tg('antenna', 'green', true)}${tg('wifi', 'blue', true)}${tg('bluetooth', 'blue', true)}</div>
+  <div class="glass m w2 h2 sq np" data-glass="big" style="--n:2">
+    <div class="top"><div class="art"></div>${icon('airplay')}</div>
+    <div><b>Midnight Drift</b><span>Tidal Lights</span></div>
+    <div class="ctl"><button>${icon('backward')}</button><button id="pp">${icon('pause')}</button><button>${icon('forward')}</button></div>
+  </div>
+  <button class="glass m circ tg1" data-glass="small" style="--n:3">${icon('rotation')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:4">${icon('mirror')}</button>
+  <div class="glass m h2 slider" data-glass="slider" style="--n:5;--v:.62">${'<div class="fill"></div>'}${icon('sun')}</div>
+  <div class="glass m h2 slider" data-glass="slider" style="--n:6;--v:.4"><div class="fill"></div>${icon('speaker')}</div>
+  <div class="glass m w2 focus" data-glass="wide" style="--n:7">${tg('moon', 'blue', false)}<span>Focus</span></div>
+  <button class="glass m circ tg1" data-glass="small" style="--n:8">${icon('flashlight')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:9">${icon('timer')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:10">${icon('calculator')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:11">${icon('camera')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:12">${icon('moon')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:13">${icon('bell')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:14">${icon('note')}</button>
+  <button class="glass m circ tg1" data-glass="small" style="--n:15">${icon('lock')}</button>`;
+
+document.querySelectorAll('.tg').forEach(b => b.addEventListener('click', () => b.classList.toggle('on')));
+document.querySelectorAll('.tg1').forEach(b => b.addEventListener('click', () => b.classList.toggle('on')));
+$('#pp').addEventListener('click', e => { const b = e.currentTarget; b.dataset.p = b.dataset.p ? '' : '1'; b.innerHTML = icon(b.dataset.p ? 'play' : 'pause'); });
+
+document.querySelectorAll('.slider').forEach(s => {
+  let id = null;
+  const set = e => {
+    const r = s.getBoundingClientRect();
+    s.style.setProperty('--v', Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height)).toFixed(3));
+  };
+  s.addEventListener('pointerdown', e => { id = e.pointerId; s.setPointerCapture(id); s.classList.add('active'); set(e); });
+  s.addEventListener('pointermove', e => { if (e.pointerId === id) set(e); });
+  const end = e => { if (e.pointerId === id) { id = null; s.classList.remove('active'); } };
+  s.addEventListener('pointerup', end); s.addEventListener('pointercancel', end);
+});
+
+// rim highlights follow the pointer; refraction tries also re-light the specular map (throttled)
+let relight = 0;
+Page.motionLight(a => {
+  const t = Page.tries[Page.current];
+  if (!t.glass) return;
+  clearTimeout(relight);
+  relight = setTimeout(() => document.querySelectorAll('[data-glass]').forEach(el => {
+    const h = LiquidGlass.get(el); if (h) h.update({ lightAngle: Page.cssAngleToLight(a) });
+  }), 120);
+});
+
+const clear = { bezel: 20, thickness: 22, blur: 1, saturate: 1.6, specular: .85, brightness: 1.02 };
+const tinted = { bezel: 18, thickness: 18, blur: 6, saturate: 1.5, specular: .55, brightness: .95 };
+Page.init({
+  title: 'Control Center',
+  start: 1,
+  tries: [
+    { title: 'iOS 18 platters', cls: 'm-ios18', glass: null,
+      desc: `<p>Control Center as it looked before Liquid Glass: the home screen behind is heavily blurred and dimmed, and modules are dark frosted platters with ~22px corners.</p>
+        <ul><li><code>blur(30px) saturate(160%)</code> over a 50% charcoal tint.</li><li>No rim light, no lensing. The platters read as flat grey cards.</li></ul>` },
+    { title: 'iOS 26 — Liquid Glass (Clear)', cls: 'm-clear',
+      glass: { default: clear, big: { ...clear, bezel: 26, thickness: 28 }, slider: { ...clear, bezel: 22 } },
+      desc: `<p>iOS 26's default look. The background is only lightly blurred, and every module is a near-transparent lens:</p>
+        <ul><li>Modules become circles and capsules, with radii concentric to the device corners.</li>
+        <li>Snell's-law refraction at each rim; the wallpaper bends around the edges.</li>
+        <li>Specular rim map re-lit as the pointer moves, like Apple's motion-reactive highlights.</li>
+        <li>Coloured "on" states stay saturated and opaque so they still read on clear glass.</li></ul>` },
+    { title: 'iOS 26.1 — Tinted', cls: 'm-tinted',
+      glass: { default: tinted, big: { ...tinted, bezel: 24, thickness: 22 }, slider: tinted },
+      desc: `<p>iOS 26.1 added a <b>Clear / Tinted</b> choice (Settings → Display &amp; Brightness → Liquid Glass) after legibility complaints.</p>
+        <ul><li>Same lens shapes and refraction, but more frost (<code>blur 6px</code>) and a darker tint for contrast.</li>
+        <li>Weaker specular: less sparkle, more readable.</li></ul>` },
+  ],
+});
+</script>
+</body>
+</html>

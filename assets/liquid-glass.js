@@ -34,7 +34,7 @@
     brightness: 1,
     chromatic: 0,       // 0..0.3 — splits R/G/B displacement scales
     specular: 0.7,      // 0..1 rim highlight opacity
-    lightAngle: -55,    // degrees, screen space (0 = from the right, -90 = from top)
+    lightAngle: -135,   // degrees, screen space, direction toward the light (-90 = above, -135 = top-left)
     radius: null,       // override corner radius; null = read from CSS
     fallbackBlur: 14,
   };

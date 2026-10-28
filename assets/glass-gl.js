@@ -130,7 +130,7 @@
       this.source = source;
       this.params = Object.assign({
         bezel: 22, thickness: 26, ior: 1.5, frost: 2, chromatic: 0.12, specular: 0.8,
-        merge: 28, tint: 0.04, magnify: 0.06, shadow: 0.22, saturate: 1.35, lightAngle: -55,
+        merge: 28, tint: 0.04, magnify: 0.06, shadow: 0.22, saturate: 1.35, lightAngle: -135,
       }, params);
       this.shapes = () => [];
       const gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false });

@@ -74,6 +74,23 @@
     return `<div class="statusbar"><span>${time || '9:41'}</span><span class="right">${icon('cellular')}${icon('wifi')}<span class="battery"></span></span></div>`;
   }
 
+  /* ---------- home screen (icons + dock) ---------- */
+  const APPS = [
+    ['Camera', 'camera', '#8e8e93', '#3a3a3c'], ['Photos', 'photo', '#ff9f0a', '#ff375f'], ['Music', 'note', '#ff5e7d', '#ff2d55'], ['Weather', 'cloud', '#5ac8fa', '#0a84ff'],
+    ['Clock', 'clock', '#2c2c2e', '#000'], ['Notes', 'text', '#ffe066', '#ffcc00'], ['Maps', 'map', '#7ee081', '#30b0c7'], ['Calendar', 'calendar', '#fff', '#e5e5ea'],
+    ['Books', 'book', '#ffb340', '#ff7a00'], ['Files', 'folder', '#64d2ff', '#0a84ff'], ['Wallet', 'wallet', '#3a3a3c', '#000'], ['Health', 'heart', '#fff', '#f2f2f7'],
+    ['Settings', 'gear', '#aeaeb2', '#636366'], ['Podcasts', 'radio', '#d17bff', '#8944ab'], ['Stocks', 'star', '#2c2c2e', '#1c1c1e'], ['Timer', 'timer', '#ff9f0a', '#ff6b00'],
+  ];
+  const DOCK = [['Phone', 'phone', '#65e06f', '#30c048'], ['Mail', 'mail', '#5ac8fa', '#007aff'], ['Messages', 'message', '#65e06f', '#30c048'], ['Music', 'note', '#ff5e7d', '#ff2d55']];
+  const GLYPH = { Calendar: '#ff3b30', Health: '#ff2d55', Clock: '#fff' };
+  function appIcon([name, ic, c1, c2], label) {
+    return `<div class="app"><div class="app-ic" style="background:linear-gradient(${c1},${c2});color:${GLYPH[name] || '#fff'}">${icon(ic)}</div>${label ? `<span>${name}</span>` : ''}</div>`;
+  }
+  function homeScreen() {
+    return `<div class="home-grid">${APPS.map(a => appIcon(a, true)).join('')}</div>
+      <div class="home-dock" data-glass="dock">${DOCK.map(a => appIcon(a, false)).join('')}</div>`;
+  }
+
   /* ---------- draggable ---------- */
   function draggable(el, opts) {
     opts = opts || {};
@@ -130,9 +147,15 @@
     });
   }
 
+  // CSS gradient angle (where the rim gradient starts bright) → screen-space light direction
+  function cssAngleToLight(deg) {
+    const r = deg * Math.PI / 180;
+    return Math.atan2(Math.cos(r), -Math.sin(r)) * 180 / Math.PI;
+  }
+
   /* ---------- page / tries ---------- */
   const Page = {
-    icon, statusBar, draggable, motionLight, current: null, tries: [],
+    icon, statusBar, draggable, motionLight, homeScreen, cssAngleToLight, current: null, tries: [],
 
     init(cfg) {
       this.cfg = cfg;
@@ -151,7 +174,7 @@
         notes.insertAdjacentHTML('afterbegin',
           `<div class="card" id="try-card"><div class="eyebrow" id="try-eyebrow"></div><h2 id="try-title"></h2><div id="try-desc"></div>
            <p class="kbd" style="margin:10px 0 0">Press <b>1</b>–<b>${cfg.tries.length}</b> to switch attempts.</p></div>`);
-        if (!global.LiquidGlass || !LiquidGlass.supported) {
+        if (global.LiquidGlass && !LiquidGlass.supported) {
           notes.insertAdjacentHTML('afterbegin', `<div class="banner">SVG refraction only runs in Chromium browsers (Chrome, Edge, Brave, Arc, Opera). In this browser the refraction attempts fall back to a plain blur — the WebGL attempt still works everywhere.</div>`);
         }
       }

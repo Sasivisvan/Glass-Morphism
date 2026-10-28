@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Classic iOS Materials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .wallpaper { background-image: url(assets/img/p1050.jpg); }
+  .content { position: absolute; inset: 60px 14px 0; display: flex; flex-direction: column; gap: 10px; }
+  .banner-n { border-radius: 22px; padding: 12px 14px; display: flex; gap: 11px; align-items: center; }
+  .banner-n .ic { width: 38px; height: 38px; border-radius: 9px; background: linear-gradient(#65e06f,#30c048); display: grid; place-items: center; font-size: 21px; color: #fff; flex: none; }
+  .banner-n b { display: block; font-size: 15px; } .banner-n span { font-size: 14px; }
+  .mat { position: relative; border-radius: 18px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; min-height: 66px; overflow: hidden; }
+  .mat .name { font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
+  .mat .sub { font-size: 12.5px; }
+  .mat .val { font: 11.5px/1.3 ui-monospace, Menlo, monospace; text-align: right; }
+  .home-dock { bottom: 12px; }
+
+  /* light / dark text */
+  .phone { --label: #000; --label2: rgba(60,60,67,.6); }
+  .phone.dark { --label: #fff; --label2: rgba(235,235,245,.6); }
+  .mat, .banner-n { color: var(--label); }
+  .mat .sub, .mat .val, .banner-n span { color: var(--label2); }
+
+  /* Try 1 — naive: one recipe for everything */
+  .m-naive .glass { --tint: rgba(255,255,255,.2); --blur: 10px; --sat: 100%; --rim: 0; --shadow: 0 8px 32px rgba(31,38,135,.2); border: 1px solid rgba(255,255,255,.35); }
+  .m-naive .phone.dark .glass { --tint: rgba(0,0,0,.2); border-color: rgba(255,255,255,.15); }
+
+  /* Try 2/3 — UIBlurEffect-like hierarchy (values matched by eye) */
+  .m-apple .glass, .m-vibrant .glass { --rim: 0; --shadow: none; --sat: 180%; }
+  .m-apple [data-mat=ultrathin], .m-vibrant [data-mat=ultrathin] { --blur: 12px; --tint: rgba(255,255,255,.26); }
+  .m-apple [data-mat=thin], .m-vibrant [data-mat=thin] { --blur: 18px; --tint: rgba(255,255,255,.44); }
+  .m-apple [data-mat=regular], .m-vibrant [data-mat=regular] { --blur: 24px; --tint: rgba(255,255,255,.6); }
+  .m-apple [data-mat=thick], .m-vibrant [data-mat=thick] { --blur: 30px; --tint: rgba(255,255,255,.76); }
+  .m-apple [data-mat=chrome], .m-vibrant [data-mat=chrome] { --blur: 22px; --tint: rgba(246,246,248,.8); --sat: 200%; }
+  .m-apple .phone.dark [data-mat=ultrathin], .m-vibrant .phone.dark [data-mat=ultrathin] { --tint: rgba(18,18,20,.28); }
+  .m-apple .phone.dark [data-mat=thin], .m-vibrant .phone.dark [data-mat=thin] { --tint: rgba(24,24,26,.44); }
+  .m-apple .phone.dark [data-mat=regular], .m-vibrant .phone.dark [data-mat=regular] { --tint: rgba(28,28,30,.6); }
+  .m-apple .phone.dark [data-mat=thick], .m-vibrant .phone.dark [data-mat=thick] { --tint: rgba(30,30,32,.76); }
+  .m-apple .phone.dark [data-mat=chrome], .m-vibrant .phone.dark [data-mat=chrome] { --tint: rgba(40,40,42,.8); }
+
+  /* Try 3 — vibrancy + grain + hairlines */
+  .m-vibrant .mat .sub, .m-vibrant .mat .val, .m-vibrant .banner-n span { color: rgba(0,0,0,.55); mix-blend-mode: plus-darker; }
+  .m-vibrant .phone.dark .mat .sub, .m-vibrant .phone.dark .mat .val, .m-vibrant .phone.dark .banner-n span { color: rgba(255,255,255,.45); mix-blend-mode: plus-lighter; }
+  .m-vibrant .mat::after, .m-vibrant .banner-n::after, .m-vibrant .home-dock::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .m-vibrant .glass { box-shadow: inset 0 0 0 .5px rgba(255,255,255,.3) !important; }
+  .m-vibrant .phone.dark .glass { box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08) !important; }
+
+  .modebtn { margin-top: 4px; display: inline-flex; gap: 8px; align-items: center; padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body>
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">Appearance</div>
+      <p>iOS ships every material in light and dark variants.</p>
+      <button class="modebtn" id="mode"></button>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="phone" id="phone">
+      <div class="screen">
+        <div class="wallpaper"></div>
+        <div class="content" id="content"></div>
+        <div id="dock"></div>
+        <div class="island"></div>
+        <div id="sb"></div>
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const { icon } = Page;
+$('#sb').innerHTML = Page.statusBar();
+const M = [
+  ['ultrathin', 'Ultra Thin', 'systemUltraThinMaterial', 'blur 12 · tint 26%'],
+  ['thin', 'Thin', 'systemThinMaterial', 'blur 18 · tint 44%'],
+  ['regular', 'Regular', 'systemMaterial', 'blur 24 · tint 60%'],
+  ['thick', 'Thick', 'systemThickMaterial', 'blur 30 · tint 76%'],
+  ['chrome', 'Chrome', 'systemChromeMaterial', 'blur 22 · sat 200%'],
+];
+$('#content').innerHTML = `<div class="banner-n glass" data-mat="regular"><div class="ic">${icon('message')}</div><div><b>Maya</b><span>Still on for 7? Found the ramen place.</span></div></div>`
+  + M.map(([k, n, api, v]) => `<div class="mat glass" data-mat="${k}"><div><div class="name">${n}</div><div class="sub">${api}</div></div><div class="val">${v.replace(' · ', '<br>')}</div></div>`).join('');
+$('#dock').innerHTML = Page.homeScreen().replace(/^[\s\S]*?(<div class="home-dock")/, '$1').replace('class="home-dock"', 'class="home-dock glass" data-mat="ultrathin"');
+
+const phone = $('#phone');
+const setMode = dark => { phone.classList.toggle('dark', dark); $('#mode').innerHTML = (dark ? icon('moon') : icon('sun')) + (dark ? ' Dark' : ' Light'); };
+$('#mode').onclick = () => setMode(!phone.classList.contains('dark'));
+setMode(false);
+
+Page.init({
+  title: 'Classic iOS Materials (iOS 7–18)',
+  start: 1,
+  tries: [
+    { title: 'Naïve glassmorphism', cls: 'm-naive',
+      desc: `<p>The Dribbble recipe everyone copies: <code>blur(10px)</code>, 20% white, a 1px white border and a bluish drop shadow. Every surface the same.</p>
+        <ul><li>No hierarchy: a notification, a sheet and the dock all look identical.</li><li>No saturation boost, so colours behind go grey. Apple's materials do the opposite.</li></ul>` },
+    { title: 'UIBlurEffect hierarchy', cls: 'm-apple',
+      desc: `<p>iOS 13+ defines five thicknesses (<code>systemUltraThinMaterial</code> … <code>systemChromeMaterial</code>), each in light and dark.</p>
+        <ul><li>Thicker = more blur and more tint: content behind fades in steps.</li>
+        <li>Always <b>saturate ~180%</b>: Apple boosts the colour that bleeds through, which is why iOS blur looks rich instead of muddy.</li>
+        <li>No borders or shadows: edges come from contrast alone.</li>
+        <li>Values are matched by eye; Apple doesn't publish them.</li></ul>` },
+    { title: 'Hierarchy + vibrancy + grain', cls: 'm-vibrant',
+      desc: `<p>The last 10% that makes it read as "real iOS":</p>
+        <ul><li><b>Vibrancy</b>: secondary labels use <code>plus-lighter</code> / <code>plus-darker</code> blending, so they pick up the colour of what's behind, like <code>UIVibrancyEffect</code>.</li>
+        <li>Faint noise grain overlay (SVG turbulence at 7%) kills banding in big blurs.</li>
+        <li>0.5px inner hairline instead of a border.</li></ul>` },
+  ],
+});
+</script>
+</body>
+</html>

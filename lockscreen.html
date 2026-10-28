@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lock Screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .wallpaper { background-image: url(assets/img/p1069.jpg); background-position: 58% 30%; }
+  .lockicon { position: absolute; z-index: 5; top: 60px; left: 50%; transform: translateX(-50%); font-size: 20px; }
+  .date { position: absolute; z-index: 5; top: 92px; left: 0; right: 0; text-align: center; font-size: 20px; font-weight: 600; letter-spacing: -.01em; color: rgba(255,255,255,.88); }
+  .clock-wrap { position: absolute; z-index: 5; top: 112px; left: 0; right: 0; display: flex; justify-content: center; }
+  .clock-solid { font-size: 112px; font-weight: 700; letter-spacing: -.045em; line-height: 1; color: rgba(255,255,255,.94); }
+  .clock-glass { display: none; position: relative; }
+  .clock-glass .tintlayer { position: absolute; inset: 0; background: rgba(255,255,255,var(--ct, .1)); }
+  body.glassclock .clock-solid { display: none; }
+  body.glassclock .clock-glass { display: block; }
+
+  .widgets { position: absolute; z-index: 5; top: 250px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; }
+  .wd { width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center; text-align: center; font-size: 12px; font-weight: 600; line-height: 1.1; }
+  .wd b { display: block; font-size: 19px; font-weight: 700; }
+  .wd .i { font-size: 18px; margin: 0 auto 2px; }
+  .ring { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(#30d158 0 84%, rgba(255,255,255,.2) 84% 100%); -webkit-mask: radial-gradient(closest-side, transparent 76%, #000 78%); mask: radial-gradient(closest-side, transparent 76%, #000 78%); position: absolute; }
+
+  .stack { position: absolute; z-index: 5; left: 10px; right: 10px; bottom: 118px; display: grid; gap: 8px; cursor: pointer; }
+  .nt { border-radius: 26px; padding: 13px 14px; display: flex; gap: 11px; align-items: flex-start; transition: transform .5s cubic-bezier(.3,1.3,.4,1), opacity .4s, margin .5s cubic-bezier(.3,1.3,.4,1); }
+  .nt .ic { width: 38px; height: 38px; border-radius: 9px; flex: none; display: grid; place-items: center; font-size: 22px; color: #fff; }
+  .nt .body { flex: 1; min-width: 0; }
+  .nt .hd { display: flex; justify-content: space-between; font-size: 15px; font-weight: 650; }
+  .nt .hd time { font-weight: 400; font-size: 13px; opacity: .6; }
+  .nt p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
+  .stack:not(.open) .nt:nth-child(n+2) { margin-top: -66px; transform: scale(.94) translateY(14px); }
+  .stack:not(.open) .nt:nth-child(n+3) { transform: scale(.88) translateY(26px); }
+  .stack:not(.open) .nt:nth-child(n+2) > * { opacity: 0; }
+  .nt:nth-child(1) { z-index: 3; } .nt:nth-child(2) { z-index: 2; } .nt:nth-child(3) { z-index: 1; }
+  .nt > * { transition: opacity .3s; }
+
+  .qa { position: absolute; z-index: 5; bottom: 44px; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; }
+  .qa.l { left: 46px; } .qa.r { right: 46px; }
+  .qa.on { background: rgba(255,255,255,.95) !important; color: #000; }
+
+  /* ---------- per try ---------- */
+  .m-ios18 .nt { --tint: rgba(250,250,252,.58); --blur: 30px; --sat: 180%; --rim: 0; --shadow: none; color: #000; }
+  .m-ios18 .nt .hd time { opacity: .5; }
+  .m-ios18 .wd, .m-ios18 .qa { --tint: rgba(30,30,34,.32); --blur: 24px; --rim: .2; --shadow: none; }
+  .m-clear .glass { --tint: rgba(0,0,0,.08); --rim: 1; --shadow: 0 6px 24px rgba(0,0,0,.18); }
+  .m-clear .nt { text-shadow: 0 1px 10px rgba(0,0,0,.35); }
+  .m-tinted .glass { --tint: rgba(40,40,46,.42); --rim: .65; --shadow: 0 6px 24px rgba(0,0,0,.2); }
+  .m-tinted { --ct: .22; }
+</style>
+</head>
+<body>
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">Interact</div>
+      <ul>
+        <li>Tap the notification stack to fan it out.</li>
+        <li>Tap the flashlight or camera buttons.</li>
+        <li>The clock in attempts 2–3 is a lens in the shape of the numerals: its displacement map is built from the blurred text alpha, so the wallpaper bends inside each digit.</li>
+      </ul>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="phone">
+      <div class="screen">
+        <div class="wallpaper"></div>
+        <div class="lockicon" id="lockicon"></div>
+        <div class="date" id="date"></div>
+        <div class="clock-wrap">
+          <div class="clock-solid">9:41</div>
+          <div class="clock-glass" id="clock"><div class="tintlayer"></div></div>
+        </div>
+        <div class="widgets">
+          <div class="wd glass" data-glass="widget"><div class="ring"></div><div><b>84</b>%</div></div>
+          <div class="wd glass" data-glass="widget" id="wx"></div>
+          <div class="wd glass" data-glass="widget"><div id="cal"></div></div>
+        </div>
+        <div class="stack" id="stack"></div>
+        <button class="qa l glass press" data-glass="qa" id="fl"></button>
+        <button class="qa r glass press" data-glass="qa" id="cam"></button>
+        <div class="island"></div>
+        <div id="sb"></div>
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/liquid-glass.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const { icon } = Page;
+$('#sb').innerHTML = Page.statusBar('');
+$('#lockicon').innerHTML = icon('lock');
+$('#fl').innerHTML = icon('flashlight');
+$('#cam').innerHTML = icon('camera');
+$('#fl').onclick = () => $('#fl').classList.toggle('on');
+$('#wx').innerHTML = `<div>${icon('cloud')}<b>18°</b></div>`;
+const now = new Date();
+$('#date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+$('#cal').innerHTML = `${now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}<b>${now.getDate()}</b>`;
+
+const notes = [
+  ['message', 'linear-gradient(#65e06f,#30c048)', 'Maya', 'now', 'Still on for 7? I found that ramen place you wanted to try 🍜'],
+  ['calendar', 'linear-gradient(#fff,#e5e5ea)', 'Design Review', '15m', 'Liquid Glass components · Studio 4'],
+  ['cloud', 'linear-gradient(#5ac8fa,#0a84ff)', 'Weather', '1h', 'Clear skies tonight with a low of 11°.'],
+];
+$('#stack').innerHTML = notes.map(([ic, bg, t, tm, p]) =>
+  `<div class="nt glass" data-glass="note"><div class="ic" style="background:${bg};${ic === 'calendar' ? 'color:#ff3b30' : ''}">${icon(ic)}</div>
+   <div class="body"><div class="hd"><span>${t}</span><time>${tm}</time></div><p>${p}</p></div></div>`).join('');
+$('#stack').onclick = () => $('#stack').classList.toggle('open');
+
+/* ---------- glass clock: text-shaped lens ---------- */
+const clock = $('#clock');
+let clockShape = null;
+async function buildClock() {
+  await document.fonts.load('700 118px Inter').catch(() => {});
+  const font = '700 118px Inter, -apple-system, system-ui, sans-serif';
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = font;
+  const text = '9:41', pad = 14;
+  const w = Math.ceil(m.measureText(text).width) + pad * 2, h = 132;
+  const draw = scale => {
+    const c = document.createElement('canvas');
+    c.width = w * scale; c.height = h * scale;
+    const x = c.getContext('2d');
+    x.scale(scale, scale);
+    x.font = font; x.textBaseline = 'alphabetic'; x.fillStyle = '#fff';
+    x.letterSpacing = '-5px';
+    x.fillText(text, pad, 112);
+    return c;
+  };
+  clockShape = draw(1);
+  const mask = draw(2).toDataURL();
+  clock.style.width = w + 'px'; clock.style.height = h + 'px';
+  clock.style.webkitMaskImage = clock.style.maskImage = `url(${mask})`;
+  clock.style.webkitMaskSize = clock.style.maskSize = '100% 100%';
+  attachClock();
+}
+function attachClock() {
+  const t = Page.tries[Page.current];
+  if (!clockShape || !t) return;
+  if (t.clock) LiquidGlass.attach(clock, Object.assign({ shape: clockShape }, t.clock));
+  else LiquidGlass.detach(clock);
+  if (!LiquidGlass.supported) clock.style.backdropFilter = 'blur(10px) saturate(1.8) brightness(1.15)';
+}
+
+const clear = { bezel: 18, thickness: 22, blur: 1, saturate: 1.5, specular: .85 };
+const tinted = { bezel: 16, thickness: 16, blur: 6, saturate: 1.4, specular: .5 };
+Page.init({
+  title: 'Lock Screen',
+  start: 1,
+  onChange: attachClock,
+  tries: [
+    { title: 'iOS 18 lock screen', cls: 'm-ios18', glass: null,
+      desc: `<p>Before Liquid Glass: a solid white clock, and notifications on a bright frosted platter with black text.</p>
+        <ul><li><code>blur(30px) saturate(180%)</code> over 58% white.</li><li>Widgets are dim frosted circles. No edges, no light.</li></ul>` },
+    { title: 'iOS 26 — glass clock, clear notifications', cls: 'm-clear glassclock',
+      clock: { bezel: 16, thickness: 30, ior: 1.6, blur: .5, saturate: 1.6, brightness: 1.25, specular: 1, chromatic: .06 },
+      glass: { default: clear, note: { ...clear, bezel: 22, thickness: 22 } },
+      desc: `<p>The iOS 26 lock screen: the time is made of glass, and notifications are clear lenses with white text.</p>
+        <ul><li><b>Clock</b>: the text is drawn to a canvas, its alpha blurred into a height field, and the gradient of that field gives per-pixel normals. Snell's law turns those into a displacement map. The element is clipped to the glyphs with <code>mask-image</code>.</li>
+        <li>Brightness 1.25 and a 10% white wash make the digits glow, the way Apple's glass time picks up light.</li>
+        <li>Notifications use the rounded-rect refraction with a strong rim.</li></ul>` },
+    { title: 'iOS 26.1 — Tinted', cls: 'm-tinted glassclock',
+      clock: { bezel: 14, thickness: 22, ior: 1.5, blur: 3, saturate: 1.4, brightness: 1.3, specular: .7 },
+      glass: { default: tinted, note: { ...tinted, bezel: 20 } },
+      desc: `<p>The "Tinted" setting: more frost, a darker tint and a whiter clock for legibility.</p>
+        <ul><li>Notifications at <code>blur 6px</code> + 42% charcoal: readable over any wallpaper.</li><li>The clock keeps its lens but gets a 22% white wash.</li></ul>` },
+  ],
+});
+buildClock();
+</script>
+</body>
+</html>
