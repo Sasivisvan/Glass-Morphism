@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid Glass on the Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  .hero { position: relative; height: min(78vh, 640px); margin: 20px auto 0; max-width: 1240px; border-radius: 32px; overflow: hidden; isolation: isolate;
+    background: url(assets/img/p1015.jpg) center 62%/cover; }
+  .hero .scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.35)); }
+  .hero .bigtxt { position: absolute; left: 0; right: 0; top: 18%; text-align: center; font-size: clamp(56px, 11vw, 150px); font-weight: 800; letter-spacing: -.05em; line-height: .9; color: #fff; opacity: .95; }
+  .hero-card { position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); border-radius: 36px; padding: 26px 28px;
+    --tint: rgba(255,255,255,.06); color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.3); cursor: grab; touch-action: none; }
+  .hero-card h1 { margin: 0 0 6px; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -.03em; line-height: 1.1; }
+  .hero-card p { margin: 0; font-size: 15.5px; opacity: .92; }
+  .hero-card .hint { margin-top: 12px; font-size: 12px; opacity: .7; }
+
+  section { padding: 56px 0 8px; }
+  h2 { font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.03em; margin: 0 0 8px; line-height: 1.15; }
+  .lede { color: var(--muted); font-size: 17px; max-width: 720px; margin: 0 0 26px; }
+  .props { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .prop { border: .5px solid var(--line); border-radius: 20px; padding: 18px; background: rgba(255,255,255,.025); }
+  .prop > b { display: block; font-size: 16px; margin-bottom: 4px; letter-spacing: -.01em; }
+  .prop p { margin: 0; color: var(--muted); font-size: 14px; }
+  .prop .tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tblwrap { overflow-x: auto; border: .5px solid var(--line); border-radius: 18px; }
+  .tbl th, .tbl td { text-align: left; padding: 12px 16px; border-bottom: .5px solid var(--line); vertical-align: top; }
+  .tbl th { color: var(--faint); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .tbl tr:last-child td { border-bottom: 0; }
+  .tbl td:first-child { font-weight: 600; white-space: nowrap; }
+  .tbl td { color: var(--muted); }
+  .tbl td.ok { color: #30d158; } .tbl td.meh { color: #ffd60a; } .tbl td.no { color: #ff6961; }
+  code { font: .86em/1.4 ui-monospace, "SF Mono", Menlo, monospace; background: rgba(255,255,255,.07); padding: 1px 5px; border-radius: 5px; color: var(--fg); }
+
+  .pages { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .pg { display: block; text-decoration: none; border: .5px solid var(--line); border-radius: 24px; overflow: hidden; background: rgba(255,255,255,.025); transition: transform .4s cubic-bezier(.3,1.4,.4,1), border-color .3s; }
+  .pg:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.25); }
+  .pg img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: center top; background: #111; }
+  .pg div { padding: 14px 18px 18px; }
+  .pg b { font-size: 17px; letter-spacing: -.02em; }
+  .pg span { display: block; color: var(--muted); font-size: 13.5px; margin-top: 3px; }
+  .pg em { font-style: normal; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .sources { color: var(--muted); font-size: 14px; padding-left: 18px; }
+  .sources a { color: var(--fg); }
+  footer { padding: 48px 0 60px; color: var(--faint); font-size: 13px; }
+</style>
+</head>
+<body>
+<header class="topbar"><div class="ttl">Liquid Glass on the Web</div><a class="back" href="https://github.com/Sasivisvan/Glass-Morphism">GitHub · Docs</a></header>
+
+<div class="hero" id="hero">
+  <div class="scrim"></div>
+  <div class="bigtxt">Liquid<br>Glass</div>
+  <div class="hero-card glass" data-glass="hero" id="heroCard">
+    <h1>Recreating iPhone's glass, in the browser.</h1>
+    <p>A study of Apple's iOS 26 Liquid Glass and the frosted materials before it, rebuilt with CSS, SVG displacement maps and WebGL. Every page has several attempts so you can compare them side by side.</p>
+    <div class="hint">Drag this card over the title to see it refract.</div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section>
+    <h2>What Liquid Glass actually is</h2>
+    <p class="lede">Apple announced Liquid Glass at WWDC on June 9, 2025, and shipped it across iOS 26, iPadOS 26, macOS Tahoe 26, watchOS 26 and tvOS 26. Apple calls it a translucent material that <i>reflects and refracts its surroundings</i>. The older materials <b>scatter</b> light (blur); this one <b>bends</b> it.</p>
+    <div class="props">
+      <div class="prop"><span class="tag">Optics</span><b>Lensing</b><p>The rim of each control is curved like real glass. Light passing through it bends, so content near the edge gets compressed and pulled inward while the flat centre stays crisp.</p></div>
+      <div class="prop"><span class="tag">Optics</span><b>Specular highlights</b><p>A thin bright rim catches light from one side (plus a weaker kick on the opposite edge) and moves as you tilt the device.</p></div>
+      <div class="prop"><span class="tag">Adaptivity</span><b>Content-aware tint</b><p>The material lightens or darkens with what's under it, flips between light and dark looks, and deepens its shadow over busy content to stay legible.</p></div>
+      <div class="prop"><span class="tag">Variants</span><b>Regular &amp; Clear</b><p><i>Regular</i> is the adaptive default. <i>Clear</i> is far more transparent, for use over rich media with a dimming layer. iOS 26.1 added a user setting: <b>Clear</b> or <b>Tinted</b>.</p></div>
+      <div class="prop"><span class="tag">Motion</span><b>Fluid morphing</b><p>Glass shapes merge, split and morph like droplets (SwiftUI <code>GlassEffectContainer</code>). Touched controls swell, glow from the touch point, and thumbs turn into magnifying lenses.</p></div>
+      <div class="prop"><span class="tag">Layout</span><b>Navigation layer only</b><p>Glass floats <i>above</i> content: tab bars, toolbars, sheets and controls. Shapes are capsules with corner radii concentric to the device, and bars shrink away as you scroll.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Before it: the frosted materials (iOS 7–18)</h2>
+    <p class="lede">iOS 7 (2013) introduced live blur. iOS 13 formalised it into five thicknesses, from <code>systemUltraThinMaterial</code> to <code>systemChromeMaterial</code>, each with light and dark versions and paired <b>vibrancy</b> for text. The trick most web copies miss is the heavy <b>saturation boost</b>: Apple's blur makes colours richer, not greyer.</p>
+  </section>
+
+  <section>
+    <h2>How each web technique compares</h2>
+    <p class="lede">There is no CSS property for refraction. These are the options, and what each gets right:</p>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>Technique</th><th>Refraction</th><th>Browsers</th><th>Notes</th></tr>
+      <tr><td>CSS <code>backdrop-filter: blur() saturate()</code></td><td class="no">None</td><td class="ok">All</td><td>Perfect for the classic frosted materials. Cannot bend the backdrop, so it can't do Liquid Glass.</td></tr>
+      <tr><td>SVG <code>feTurbulence</code> → <code>feDisplacementMap</code></td><td class="meh">Random wobble</td><td class="meh">Chromium</td><td>The common "liquid glass CSS" demo. Distorts everywhere, unlike real glass, which bends only at the curved rim.</td></tr>
+      <tr><td>Physics-derived displacement map (Snell's law) via <code>backdrop-filter: url()</code></td><td class="ok">Real edge lensing</td><td class="meh">Chromium</td><td>Closest DOM-native result. Map must be regenerated whenever size or shape changes. Needs a CSS function before <code>url()</code> or Chromium drops dark pixels.</td></tr>
+      <tr><td>WebGL2 fragment shader</td><td class="ok">Full: dispersion, Fresnel, merging</td><td class="ok">All</td><td>Most physically correct, and the only way to get melting shapes. It can only refract what you paint into its texture.</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>The recreations</h2>
+    <p class="lede">Every page has a switcher at the top (or keys <b>1</b>–<b>5</b>) to flip between attempts, with notes on what each one changes. Use Chrome, Edge, Brave or Arc for the refraction attempts.</p>
+    <div class="pages">
+      <a class="pg" href="lens.html"><img src="assets/thumbs/lens.jpg" alt="" loading="lazy"><div><b>Lens Lab</b><span>The material itself. Drag glass over a scene and tune bezel, thickness, IOR, frost and dispersion live.</span><em>5 attempts · CSS → noise → Snell → dispersion → WebGL</em></div></a>
+      <a class="pg" href="tabbar.html"><img src="assets/thumbs/tabbar.jpg" alt="" loading="lazy"><div><b>Floating Tab Bar</b><span>iOS 26 app chrome: tab bar that minimises on scroll, a droplet selection you can drag, and a scroll-edge blur.</span><em>3 attempts · Frosted / Regular / Clear</em></div></a>
+      <a class="pg" href="control-center.html"><img src="assets/thumbs/control-center.jpg" alt="" loading="lazy"><div><b>Control Center</b><span>Toggles, sliders and now-playing as glass modules, with highlights that follow your pointer.</span><em>3 attempts · iOS 18 / iOS 26 Clear / 26.1 Tinted</em></div></a>
+      <a class="pg" href="lockscreen.html"><img src="assets/thumbs/lockscreen.jpg" alt="" loading="lazy"><div><b>Lock Screen</b><span>The glass clock: a lens shaped like the numerals, built from the text's alpha. Plus clear notification stacks.</span><em>3 attempts · iOS 18 / Clear / Tinted</em></div></a>
+      <a class="pg" href="components.html"><img src="assets/thumbs/components.jpg" alt="" loading="lazy"><div><b>Glass Components</b><span>The library's ready-made components: buttons, switch, slider, segmented control, tab bar, toolbar, morphing menu and glass text.</span><em>3 attempts · CSS fallback / defaults / + motion</em></div></a>
+      <a class="pg" href="materials.html"><img src="assets/thumbs/materials.jpg" alt="" loading="lazy"><div><b>Classic iOS Materials</b><span>The five UIBlurEffect thicknesses in light and dark, versus the naïve glassmorphism recipe.</span><em>3 attempts · naïve / hierarchy / + vibrancy</em></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sources</h2>
+    <ul class="sources">
+      <li><a href="https://www.apple.com/newsroom/2025/06/apple-introduces-a-delightful-and-elegant-new-software-design/">Apple Newsroom: Apple introduces a delightful and elegant new software design</a> (June 2025)</li>
+      <li><a href="https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views">Apple Developer: Applying Liquid Glass to custom views</a></li>
+      <li><a href="https://kube.io/blog/liquid-glass-css-svg/">kube.io: Liquid Glass in the browser</a> (Snell's-law displacement maps, surface profiles)</li>
+      <li><a href="https://blog.logrocket.com/how-create-liquid-glass-effects-css-and-svg/">LogRocket: How to create Liquid Glass effects with CSS and SVG</a></li>
+      <li><a href="https://medium.com/ekino-france/liquid-glass-in-css-and-svg-839985fcb88d">ekino: Liquid Glass in CSS and SVG</a></li>
+      <li><a href="https://appleinsider.com/articles/25/06/10/ios-26-vs-ios-18-is-apples-liquid-glass-a-true-redesign">AppleInsider: iOS 26 vs iOS 18</a></li>
+    </ul>
+  </section>
+  <footer>Built by <a href="https://github.com/Sasivisvan">Sasivisvan</a> and <a href="https://github.com/Kathin-M">Kathin-M</a> · MIT License · Photos from Unsplash via Lorem Picsum · An independent project, not affiliated with Apple.</footer>
+</main>
+
+<script src="../dist/liquid-glass.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const card = document.getElementById('heroCard'), hero = document.getElementById('hero');
+LiquidGlass.attach(card, { bezel: 30, thickness: 34, ior: 1.55, blur: 1.5, saturate: 1.5, specular: .85, chromatic: .08 });
+// switch from the centred transform to explicit coordinates before the first drag
+card.addEventListener('pointerdown', () => {
+  if (card.style.left) return;
+  card.style.left = card.offsetLeft - card.offsetWidth / 2 + 'px';
+  card.style.top = card.offsetTop + 'px';
+  card.style.bottom = 'auto';
+  card.style.transform = 'none';
+}, true);
+Page.draggable(card, { bounds: hero });
+</script>
+</body>
+</html>

@@ -1,5 +1,10 @@
+/*!
+ * Glass Morphism — WebGL2 renderer
+ * https://github.com/Sasivisvan/Glass-Morphism
+ * MIT License · (c) 2026 Sasivisvan and contributors
+ */
 /*
- * glass-gl.js — a WebGL2 Liquid Glass renderer.
+ * liquid-glass-gl.js — a WebGL2 Liquid Glass renderer.
  *
  * Unlike the SVG approach this runs in every modern browser, and because the
  * whole scene is one shader it can do things CSS cannot: shapes that melt into
@@ -10,7 +15,13 @@
  * The background has to be a texture, so the page paints its backdrop into a
  * <canvas> and hands it over as `source`.
  */
-(function (global) {
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else {
+    root.LiquidGlassGL = factory();
+    if (root.LiquidGlass) root.LiquidGlass.GL = root.LiquidGlassGL;
+  }
+})(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
   const VS = `#version 300 es
@@ -227,5 +238,5 @@
     stop() { this.running = false; }
   }
 
-  global.GlassGL = GlassGL;
-})(window);
+  return GlassGL;
+});

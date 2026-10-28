@@ -87,8 +87,8 @@
   </section>
 </main>
 
-<script src="assets/liquid-glass.js"></script>
-<script src="assets/glass-gl.js"></script>
+<script src="../dist/liquid-glass.js"></script>
+<script src="../dist/liquid-glass-gl.js"></script>
 <script src="assets/page.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -147,7 +147,7 @@ photo.onload = paint;
 new ResizeObserver(paint).observe(lab);
 
 /* ---------- WebGL renderer ---------- */
-const gl = new GlassGL($('#gl'), bg);
+const gl = new LiquidGlassGL($('#gl'), bg);
 gl.shapes = () => {
   const r0 = lab.getBoundingClientRect();
   return [...document.querySelectorAll('.obj')].map(el => {

@@ -1,0 +1,59 @@
+{
+  "name": "glass-morphism",
+  "version": "1.0.0",
+  "description": "Liquid Glass for the web: real refraction (Snell's law displacement maps), specular rims, presets and iOS 26-style glass components. Zero dependencies.",
+  "keywords": [
+    "liquid-glass",
+    "glassmorphism",
+    "glass",
+    "refraction",
+    "backdrop-filter",
+    "svg-filter",
+    "webgl",
+    "ios-26",
+    "ui-components"
+  ],
+  "homepage": "https://sasivisvan.github.io/Glass-Morphism/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sasivisvan/Glass-Morphism.git"
+  },
+  "bugs": "https://github.com/Sasivisvan/Glass-Morphism/issues",
+  "license": "MIT",
+  "author": "Sasivisvan (https://github.com/Sasivisvan)",
+  "contributors": [
+    "Kathin-M (https://github.com/Kathin-M)"
+  ],
+  "main": "dist/liquid-glass.js",
+  "module": "dist/liquid-glass.mjs",
+  "types": "dist/liquid-glass.d.ts",
+  "style": "dist/liquid-glass.css",
+  "unpkg": "dist/liquid-glass.js",
+  "jsdelivr": "dist/liquid-glass.js",
+  "exports": {
+    ".": {
+      "types": "./dist/liquid-glass.d.ts",
+      "import": "./dist/liquid-glass.mjs",
+      "require": "./dist/liquid-glass.js"
+    },
+    "./gl": {
+      "types": "./dist/liquid-glass-gl.d.ts",
+      "import": "./dist/liquid-glass-gl.mjs",
+      "require": "./dist/liquid-glass-gl.js"
+    },
+    "./css": "./dist/liquid-glass.css",
+    "./dist/*": "./dist/*"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && python3 -m http.server 8931",
+    "prepublishOnly": "node scripts/build.mjs"
+  }
+}

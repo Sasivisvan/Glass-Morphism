@@ -1,0 +1,237 @@
+/*!
+ * Glass Morphism — Liquid Glass for the web
+ * https://github.com/Sasivisvan/Glass-Morphism
+ * MIT License · (c) 2026 Sasivisvan and contributors
+ */
+
+/* =====================================================================
+ * Tokens
+ * ===================================================================== */
+:root {
+  --lg-light: 135deg;            /* rim gradient angle; LiquidGlass.setLight() updates it */
+  --lg-accent: #0a84ff;
+  --lg-on: #34c759;              /* switch "on" colour */
+  --lg-ease: cubic-bezier(.3, 1.4, .4, 1);
+  --lg-ease-soft: cubic-bezier(.3, 1.2, .4, 1);
+}
+
+/* =====================================================================
+ * Glass surface
+ *
+ * The backdrop (blur or refraction) is set inline by liquid-glass.js.
+ * The CSS backdrop-filter below is the no-JS / unsupported fallback.
+ * ===================================================================== */
+:is(.lg, .lg-button, .lg-segmented, .lg-tabbar, .lg-toolbar, .lg-menu, .lg-thumb, .lg-indicator) {
+  --lg-tint: rgba(255, 255, 255, .08);
+  --lg-rim: 1;
+  --lg-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+  --lg-blur: 16px;
+  --lg-saturate: 180%;
+  background-color: var(--lg-tint);
+  box-shadow: var(--lg-shadow),
+    inset 0 .5px 0 rgba(255, 255, 255, calc(.45 * var(--lg-rim))),
+    inset 0 -.5px 0 rgba(255, 255, 255, calc(.12 * var(--lg-rim))),
+    inset 0 0 22px rgba(255, 255, 255, calc(.05 * var(--lg-rim)));
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
+}
+:where(.lg, .lg-button, .lg-segmented, .lg-tabbar, .lg-toolbar, .lg-menu) { position: relative; }
+
+/* rim highlight: a gradient hairline lit from --lg-light */
+:is(.lg, .lg-button, .lg-segmented, .lg-tabbar, .lg-toolbar, .lg-menu, .lg-thumb, .lg-indicator)::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(var(--lg-light),
+    rgba(255, 255, 255, calc(.75 * var(--lg-rim))) 0%,
+    rgba(255, 255, 255, calc(.12 * var(--lg-rim))) 22%,
+    rgba(255, 255, 255, 0) 45%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, calc(.14 * var(--lg-rim))) 80%,
+    rgba(255, 255, 255, calc(.5 * var(--lg-rim))) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+/* variants — pair with the matching JS preset */
+.lg--clear { --lg-tint: rgba(255, 255, 255, .04); --lg-blur: 4px; }
+.lg--tinted { --lg-tint: rgba(40, 40, 46, .42); --lg-rim: .65; --lg-blur: 20px; }
+.lg--dark { --lg-tint: rgba(0, 0, 0, .24); }
+.lg--light { --lg-tint: rgba(255, 255, 255, .5); --lg-rim: .6; color: #000; }
+.lg--frosted { --lg-tint: rgba(30, 30, 32, .6); --lg-blur: 22px; --lg-rim: .5; }
+.lg--flat { --lg-shadow: none; }
+
+.lg--pill { border-radius: 999px; }
+.lg--circle { border-radius: 50%; aspect-ratio: 1; }
+
+/* =====================================================================
+ * Button
+ * ===================================================================== */
+.lg-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 50px; padding: 0 24px;
+  border: 0; border-radius: 999px;
+  font-family: inherit; font-weight: 600; font-size: 17px; line-height: 1; color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .3);
+  cursor: pointer; overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .5s cubic-bezier(.25, 1.6, .4, 1);
+}
+.lg-button > * { position: relative; z-index: 1; }
+.lg-button::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  opacity: 0; transition: opacity .35s;
+  background: radial-gradient(120px circle at var(--lg-px, 50%) var(--lg-py, 50%), rgba(255, 255, 255, .35), transparent 60%);
+}
+.lg-button.is-pressed { transform: scale(1.1); }
+.lg-button.is-pressed::after { opacity: 1; }
+.lg-button:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 3px; }
+.lg-button--prominent { --lg-tint: color-mix(in srgb, var(--lg-accent) 75%, transparent); text-shadow: none; }
+.lg-button--icon { width: 50px; padding: 0; font-size: 21px; }
+.lg-button--small { height: 36px; padding: 0 16px; font-size: 15px; }
+.lg-button--small.lg-button--icon { width: 36px; padding: 0; font-size: 17px; }
+
+/* =====================================================================
+ * Thumb (switch / slider)
+ * Solid white at rest, a magnifying lens while pressed.
+ * ===================================================================== */
+.lg-thumb {
+  position: absolute; z-index: 1;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+  pointer-events: none;
+  transition: transform .45s var(--lg-ease), background-color .25s, left .3s var(--lg-ease-soft);
+}
+.lg-thumb:not(.is-lens) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.lg-thumb::before { opacity: 0; transition: opacity .25s; }
+.lg-thumb.is-lens { background-color: rgba(255, 255, 255, .06); box-shadow: 0 6px 18px rgba(0, 0, 0, .2); transition: transform .35s cubic-bezier(.3, 1.6, .4, 1), background-color .25s; }
+.lg-thumb.is-lens::before { opacity: 1; }
+
+/* =====================================================================
+ * Switch — <label class="lg-switch"><input type="checkbox"></label>
+ * ===================================================================== */
+.lg-switch {
+  position: relative; display: inline-block; flex: none;
+  width: 64px; height: 28px; border-radius: 14px;
+  background: rgba(120, 120, 128, .4);
+  cursor: pointer; touch-action: none;
+  transition: background .3s;
+}
+.lg-switch.is-on, .lg-switch:has(input:checked) { background: var(--lg-on); }
+.lg-switch input, .lg-slider input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.lg-switch:has(input:focus-visible), .lg-slider:has(input:focus-visible) { outline: 2px solid var(--lg-accent); outline-offset: 4px; }
+.lg-switch:has(input:disabled), .lg-slider:has(input:disabled) { opacity: .45; cursor: default; }
+.lg-switch .lg-thumb { top: 2px; left: 2px; width: 38px; height: 24px; border-radius: 12px; }
+.lg-switch.is-on .lg-thumb { left: 24px; }
+.lg-switch .lg-thumb.is-lens { transform: scale(1.45, 1.55); }
+
+/* =====================================================================
+ * Slider — <div class="lg-slider"><input type="range"></div>
+ * ===================================================================== */
+.lg-slider { position: relative; display: block; width: 100%; height: 30px; cursor: pointer; touch-action: none; --lg-value: .5; }
+.lg-slider__track { position: absolute; left: 0; right: 0; top: 12px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .35); overflow: hidden; }
+.lg-slider__fill { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--lg-value) * 100%); background: var(--lg-accent); }
+.lg-slider .lg-thumb { top: 3px; left: calc(var(--lg-value) * (100% - 38px)); width: 38px; height: 24px; border-radius: 12px; transition: transform .45s var(--lg-ease), background-color .25s; }
+.lg-slider .lg-thumb.is-lens { transform: scale(1.7, 1.75); }
+
+/* =====================================================================
+ * Indicator (segmented / tab bar selection droplet)
+ * ===================================================================== */
+.lg-indicator {
+  position: absolute; z-index: 2; pointer-events: none;
+  --lg-tint: rgba(255, 255, 255, .2); --lg-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+  --lg-blur: 0px; --lg-saturate: 100%;
+  border-radius: inherit;
+  transition: left .45s var(--lg-ease-soft), top .45s var(--lg-ease-soft), width .45s var(--lg-ease-soft), transform .4s var(--lg-ease), background-color .25s;
+}
+.lg-indicator.is-lens { --lg-tint: rgba(255, 255, 255, .03); transform: scale(1.18, 1.3); transition: transform .35s cubic-bezier(.3, 1.6, .4, 1); }
+.lg-indicator:not(.is-lens)::before { opacity: .35; }
+
+/* =====================================================================
+ * Segmented control — <div class="lg-segmented"><button>…</button>…</div>
+ * ===================================================================== */
+.lg-segmented {
+  display: inline-flex; height: 44px; padding: 3px; border-radius: 22px;
+  touch-action: none; user-select: none;
+}
+.lg-segmented > button {
+  position: relative; z-index: 1; flex: 1; min-width: 72px; padding: 0 14px;
+  border: 0; border-radius: 19px; background: none; cursor: pointer;
+  font-family: inherit; font-weight: 600; font-size: 15px; line-height: 1; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+}
+.lg-segmented > button:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: -2px; }
+.lg-segmented .lg-indicator { border-radius: 19px; }
+
+/* =====================================================================
+ * Tab bar — <nav class="lg-tabbar"><button class="lg-tabbar__item">…</button>…</nav>
+ * ===================================================================== */
+.lg-tabbar {
+  display: flex; height: 64px; padding: 4px; border-radius: 32px;
+  touch-action: none; user-select: none;
+  --lg-tint: rgba(18, 18, 20, .28);
+}
+.lg-tabbar__item {
+  position: relative; z-index: 1; flex: 1; min-width: 64px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  border: 0; border-radius: 28px; background: none; cursor: pointer;
+  font-family: inherit; font-weight: 600; font-size: 10.5px; line-height: 1; color: #fff; text-decoration: none;
+}
+.lg-tabbar__item > svg, .lg-tabbar__item > .lg-icon { width: 24px; height: 24px; }
+.lg-tabbar__item[aria-current] { color: var(--lg-accent); }
+.lg-tabbar__item:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: -2px; }
+.lg-tabbar .lg-indicator { border-radius: 28px; --lg-tint: rgba(255, 255, 255, .12); }
+
+/* =====================================================================
+ * Toolbar — a capsule that groups icon buttons
+ * ===================================================================== */
+.lg-toolbar { display: inline-flex; align-items: center; height: 52px; padding: 0 6px; border-radius: 26px; }
+.lg-toolbar > button, .lg-toolbar > a {
+  position: relative; z-index: 1;
+  display: grid; place-items: center; width: 48px; height: 44px;
+  border: 0; background: none; color: #fff; cursor: pointer; font-size: 21px;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, .3));
+}
+.lg-toolbar > hr { width: .5px; height: 24px; margin: 0 2px; border: 0; background: rgba(255, 255, 255, .35); }
+
+/* =====================================================================
+ * Morphing menu
+ * ===================================================================== */
+.lg-menu {
+  display: inline-block; overflow: hidden; border-radius: 25px; color: #fff;
+  transition: width .55s var(--lg-ease-soft), height .55s var(--lg-ease-soft), border-radius .55s;
+}
+.lg-menu.is-open { border-radius: 30px; }
+.lg-menu__trigger {
+  position: absolute; top: 0; right: 0; z-index: 1;
+  display: grid; place-items: center; width: 50px; height: 50px;
+  border: 0; background: none; color: inherit; cursor: pointer; font-size: 21px;
+  transition: opacity .2s;
+}
+.lg-menu.is-open .lg-menu__trigger { opacity: 0; pointer-events: none; }
+.lg-menu__panel {
+  position: relative; z-index: 1; width: max-content; min-width: 220px; padding: 8px;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.lg-menu.is-open .lg-menu__panel { opacity: 1; pointer-events: auto; transition: opacity .3s .18s; }
+.lg-menu__item {
+  display: flex; justify-content: space-between; align-items: center; gap: 24px; width: 100%;
+  padding: 11px 12px; border: 0; border-radius: 12px; background: none; color: inherit; cursor: pointer;
+  font-family: inherit; font-weight: 500; font-size: 16px; line-height: 1.2; text-align: left; text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+}
+.lg-menu__item:hover, .lg-menu__item:focus-visible { background: rgba(255, 255, 255, .12); outline: none; }
+
+/* =====================================================================
+ * Accessibility
+ * ===================================================================== */
+@media (prefers-reduced-transparency: reduce) {
+  :is(.lg, .lg-button, .lg-segmented, .lg-tabbar, .lg-toolbar, .lg-menu) {
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    --lg-tint: rgba(40, 40, 44, .96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.lg-button, .lg-thumb, .lg-indicator, .lg-menu, .lg-switch) { transition-duration: .01ms !important; }
+}

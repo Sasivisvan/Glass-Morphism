@@ -1,32 +1,146 @@
-# Liquid Glass on the Web
+<div align="center">
 
-A study of Apple's iOS 26 **Liquid Glass**, and the frosted materials that came before it, recreated in the browser. Each page shows several attempts at the same UI that you can switch between (top-right switcher or keys `1`–`5`).
+# Glass Morphism
 
-| Page | What it recreates | Attempts |
-| --- | --- | --- |
-| `index.html` | Research summary + links | — |
-| `lens.html` | The material itself, with live tuning | CSS frost · SVG noise · Snell's-law map · + dispersion · WebGL |
-| `tabbar.html` | iOS 26 floating tab bar, minimise-on-scroll, droplet selection | Frosted · Regular · Clear |
-| `control-center.html` | Control Center modules, sliders, toggles | iOS 18 · iOS 26 Clear · iOS 26.1 Tinted |
-| `lockscreen.html` | Glass clock (text-shaped lens), notification stack | iOS 18 · Clear · Tinted |
-| `controls.html` | Switch/slider lens thumbs, segmented control, morphing menu | CSS · Liquid Glass · + motion |
-| `materials.html` | UIBlurEffect thicknesses, light/dark | Naïve · hierarchy · + vibrancy |
+**Liquid Glass for the web.** Real refraction, moving specular highlights, and iOS 26-style glass components.<br>
+Zero dependencies · ~30 KB · MIT
 
-## Run it
+[**Live demo**](https://sasivisvan.github.io/Glass-Morphism/) · [Getting started](docs/getting-started.md) · [API](docs/api.md) · [Components](docs/components.md) · [How it works](docs/how-it-works.md)
 
-Serve the folder over HTTP (the WebGL attempt can't read images from `file://`):
+![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Types included](https://img.shields.io/badge/types-included-informational)
 
-```sh
-python3 -m http.server 8931
-# open http://localhost:8931
+![Glass lens with dispersion refracting a photo](docs/images/hero.jpg)
+
+</div>
+
+Most "glassmorphism" on the web is a blur. Apple's Liquid Glass **bends light**: the curved rim of each control refracts what's behind it while the centre stays clear. This library computes that refraction from physics (Snell's law over a curved glass rim), renders it with SVG displacement maps through `backdrop-filter`, and wraps it in ready-made components that behave like iOS 26's.
+
+## Features
+
+- **Physically based refraction.** Squircle rim profile, index of refraction, magnification and chromatic dispersion.
+- **Specular rims** that follow the pointer or device tilt.
+- **Presets** tuned side by side against iOS: `regular`, `clear`, `tinted`, `prism`, `lens`, `thumb`.
+- **Components**: button, switch, slider, segmented control, tab bar, toolbar, morphing menu. Thumbs turn into magnifying lenses when pressed.
+- **Glass text.** Any string, like the iOS 26 lock screen clock.
+- **WebGL renderer** for every browser, with shapes that melt together.
+- **Progressive.** Frosted CSS fallback in Firefox and Safari, and with no JavaScript at all. Real `<input>`s underneath, and support for reduced transparency and reduced motion.
+- **Tiny and dependency-free.** UMD + ES modules + TypeScript types.
+
+## Quick start
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.0/dist/liquid-glass.css">
+<script src="https://cdn.jsdelivr.net/gh/Sasivisvan/Glass-Morphism@v1.0.0/dist/liquid-glass.js"></script>
+
+<div style="background:url(photo.jpg) center/cover; padding:80px">
+  <div class="lg" data-liquid-glass="clear" style="border-radius:32px; padding:24px">Hello, glass</div>
+  <button class="lg-button">Glass button</button>
+  <label class="lg-switch"><input type="checkbox" checked></label>
+</div>
+
+<script>LiquidGlass.init({ light: 'pointer' });</script>
 ```
 
-Use a Chromium browser (Chrome, Edge, Brave, Arc) for the SVG refraction attempts. Firefox and Safari fall back to a blur; the WebGL attempt works everywhere.
+Or with a bundler:
 
-## How the refraction works
+```sh
+npm install github:Sasivisvan/Glass-Morphism
+```
 
-- `assets/liquid-glass.js`: for each element, builds a rounded-rect distance field and a squircle surface profile, applies Snell's law to get each pixel's sideways shift, packs that into an RGBA displacement map, and applies it with `backdrop-filter: blur() url(#filter)`. It also bakes a rim specular map, and can build maps from any alpha shape (used for the glass clock). Maps are rebuilt on resize.
-- `assets/glass-gl.js`: the same optics in a WebGL2 shader, plus mip-based frost, per-channel dispersion, Fresnel, drop shadow and smooth-min merging of shapes.
-- Chromium quirk: `backdrop-filter: url(#f)` on its own turns dark backdrop pixels transparent. Putting any CSS filter function first (`blur(0px) url(#f)`) fixes it.
+```js
+import LiquidGlass from 'glass-morphism';
+import 'glass-morphism/css';
 
-Photos: Unsplash via Lorem Picsum. Independent study, not affiliated with Apple.
+LiquidGlass.init();
+LiquidGlass.attach(document.querySelector('.card'), { preset: 'clear', chromatic: .08 });
+```
+
+## Components
+
+<table>
+<tr>
+<td width="50%"><b>Presets</b> — <code>data-liquid-glass="regular | clear | tinted | prism"</code><br><img src="docs/images/presets.jpg" alt="Glass presets"></td>
+<td width="50%"><b>Buttons</b> — <code>.lg-button</code>, <code>--prominent</code>, <code>--icon</code><br><img src="docs/images/buttons.jpg" alt="Glass buttons"></td>
+</tr>
+<tr>
+<td colspan="2"><b>Switch &amp; slider</b>: at rest, then pressed. The thumb becomes a magnifying lens.<br><img src="docs/images/switch-slider.jpg" alt="Switch and slider resting and pressed"></td>
+</tr>
+<tr>
+<td colspan="2"><b>Segmented control</b>: drag the selection and it turns into a droplet that magnifies the labels.<br><img src="docs/images/segmented.jpg" alt="Segmented control resting and dragging"></td>
+</tr>
+<tr>
+<td colspan="2"><b>Tab bar</b>: the same droplet selection, with <code>aria-current</code> and <code>lg-change</code> events.<br><img src="docs/images/tabbar.jpg" alt="Tab bar resting and dragging"></td>
+</tr>
+<tr>
+<td colspan="2"><b>Morphing menu</b>: the button morphs into the menu, and the refraction follows the shape.<br><img src="docs/images/menu.jpg" alt="Morphing menu closed and open"></td>
+</tr>
+<tr>
+<td width="50%"><b>Toolbar</b> — <code>.lg-toolbar</code><br><img src="docs/images/toolbar.jpg" alt="Glass toolbar"></td>
+<td width="50%"><b>Glass text</b> — <code>attachText(el, 'Glass')</code><br><img src="docs/images/glass-text.jpg" alt="Glass text"></td>
+</tr>
+</table>
+
+Full markup, events and theming: **[docs/components.md](docs/components.md)**.
+
+## Recreations
+
+The [demo site](https://sasivisvan.github.io/Glass-Morphism/) rebuilds real iPhone screens, each with several attempts you can flip between (keys <kbd>1</kbd>–<kbd>5</kbd>) to compare techniques.
+
+![Tab bar, Control Center and Lock Screen recreations](docs/images/screens.jpg)
+
+| Demo | What it shows |
+| --- | --- |
+| [Lens Lab](demo/lens.html) | The material itself, with live sliders. CSS blur → noise → Snell's law → dispersion → WebGL with merging shapes |
+| [Floating Tab Bar](demo/tabbar.html) | iOS 26 app chrome: tab bar that minimises on scroll, droplet selection, scroll-edge blur |
+| [Control Center](demo/control-center.html) | iOS 18 vs iOS 26 Clear vs iOS 26.1 Tinted |
+| [Lock Screen](demo/lockscreen.html) | Glass clock built from the digits, clear notification stack |
+| [Components](demo/components.html) | Every library component, using only `LiquidGlass.init()` |
+| [Classic Materials](demo/materials.html) | The iOS 7–18 blur hierarchy, light and dark |
+
+![Control Center: iOS 18, iOS 26 Clear, iOS 26.1 Tinted](docs/images/control-center-attempts.jpg)
+
+## API at a glance
+
+```js
+LiquidGlass.attach(el, 'regular' | { preset, bezel, thickness, ior, blur, chromatic, magnify, specular, … })
+LiquidGlass.detach(el)
+LiquidGlass.get(el)?.update({ magnify: .2 })
+LiquidGlass.init(root?, { observe?, light?: 'pointer' })
+LiquidGlass.setLight(angle) / LiquidGlass.followPointer()
+LiquidGlass.attachText(el, '9:41', { font, preset })
+new LiquidGlassGL(canvas, source, params)   // dist/liquid-glass-gl.js
+```
+
+See the **[API reference](docs/api.md)** for every option and default.
+
+## Browser support
+
+| | Refraction | Fallback |
+| --- | --- | --- |
+| Chrome, Edge, Brave, Arc, Opera | ✅ SVG `backdrop-filter` | — |
+| Firefox, Safari | — | ✅ frosted blur + rim highlights |
+| Any browser with WebGL2 | ✅ via `LiquidGlassGL` | — |
+
+Only Chromium accepts SVG filters in `backdrop-filter` today. **[How it works](docs/how-it-works.md)** covers the optics, the Chromium quirks, and the limits.
+
+## Development
+
+```sh
+npm run build   # src/ → dist/
+npm run dev     # build + serve on http://localhost:8931
+```
+
+No dependencies to install. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Credits
+
+- **[Sasivisvan](https://github.com/Sasivisvan)**: creator and maintainer
+- **[Kathin-M](https://github.com/Kathin-M)**: contributor
+- The Snell's-law displacement approach builds on [kube.io's "Liquid Glass in the browser"](https://kube.io/blog/liquid-glass-css-svg/).
+- Demo photos are from [Unsplash](https://unsplash.com) via [Lorem Picsum](https://picsum.photos) and are covered by the [Unsplash License](https://unsplash.com/license), not by this project's MIT license.
+
+## License
+
+[MIT](LICENSE) © 2026 Sasivisvan and contributors.
+
+*An independent open-source project. Not affiliated with or endorsed by Apple Inc. "Liquid Glass", iOS and iPhone are trademarks of Apple Inc.*

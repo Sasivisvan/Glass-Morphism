@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass Components</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="../dist/liquid-glass.css">
+<style>
+  .board { position: relative; width: 100%; border-radius: 28px; overflow: hidden; isolation: isolate;
+    background: url(assets/img/p1080.jpg) center/cover; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 .5px var(--line);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 44px 24px; padding: 44px 28px; font-family: var(--font); }
+  .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 140px; }
+  .cap { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.4); padding: 4px 10px; border-radius: 999px; }
+  .cap code { font: 11px ui-monospace, Menlo, monospace; text-transform: none; letter-spacing: 0; opacity: .8; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .tile { width: 112px; height: 112px; border-radius: 30px; display: grid; place-items: end center; padding-bottom: 12px; color: #fff; font-size: 13px; font-weight: 650; text-shadow: 0 1px 6px rgba(0,0,0,.45); }
+  .switches { display: flex; gap: 36px; transform: scale(1.35); margin: 10px 0; }
+  .slider-box { width: 260px; }
+  .tabbar-box { width: 330px; }
+  .menu-box { width: 240px; height: 200px; display: flex; justify-content: flex-end; align-items: flex-start; }
+  .glasstext { color: transparent; font: 800 104px/1 Inter, system-ui, sans-serif; letter-spacing: -4px; }
+  .lg-tabbar__item .i { font-size: 23px; }
+  .lg-toolbar .i, .lg-menu .i { font-size: 1em; }
+  .value { font: 12px ui-monospace, Menlo, monospace; color: #fff; background: rgba(0,0,0,.4); padding: 3px 8px; border-radius: 6px; min-width: 120px; text-align: center; }
+</style>
+</head>
+<body>
+<main class="layout">
+  <aside class="notes">
+    <div class="card">
+      <div class="eyebrow">This page is the library</div>
+      <p>Every control here is plain markup plus <code>LiquidGlass.init()</code> from <code>dist/</code>. No page-specific glass code.</p>
+      <ul>
+        <li><b>Hold</b> a switch or slider thumb: it swells into a magnifying lens.</li>
+        <li><b>Drag</b> across the segmented control or tab bar: the selection becomes a droplet.</li>
+        <li>Press buttons: they grow and glow from the touch point.</li>
+        <li>The <b>…</b> menu morphs open; its map rebuilds as it changes shape.</li>
+      </ul>
+    </div>
+  </aside>
+  <section class="stage">
+    <div class="board">
+      <div class="cell">
+        <div class="row">
+          <div class="lg tile" data-liquid-glass="regular">regular</div>
+          <div class="lg lg--clear tile" data-liquid-glass="clear">clear</div>
+          <div class="lg lg--tinted tile" data-liquid-glass="tinted">tinted</div>
+          <div class="lg lg--clear tile" data-liquid-glass="prism">prism</div>
+        </div>
+        <div class="cap">Presets · <code>data-liquid-glass</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="row" id="buttons"></div>
+        <div class="cap">Buttons · <code>.lg-button</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="switches">
+          <label class="lg-switch"><input type="checkbox" checked aria-label="Wi-Fi"></label>
+          <label class="lg-switch"><input type="checkbox" aria-label="Bluetooth"></label>
+        </div>
+        <div class="slider-box"><div class="lg-slider"><input type="range" min="0" max="100" value="45" aria-label="Volume" id="vol"></div></div>
+        <div class="value" id="vol-out">value: 45</div>
+        <div class="cap">Switch &amp; slider · <code>.lg-switch .lg-slider</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="lg-segmented" id="seg"><button>Day</button><button aria-pressed="true">Week</button><button>Month</button></div>
+        <div class="value" id="seg-out">selected: Week</div>
+        <div class="cap">Segmented · <code>.lg-segmented</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="tabbar-box"><nav class="lg-tabbar" id="tabs"></nav></div>
+        <div class="cap">Tab bar · <code>.lg-tabbar</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="lg-toolbar" id="toolbar"></div>
+        <div class="cap">Toolbar · <code>.lg-toolbar</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="menu-box">
+          <div class="lg-menu">
+            <button class="lg-menu__trigger" aria-label="More" id="menu-trigger"></button>
+            <div class="lg-menu__panel" id="menu-panel"></div>
+          </div>
+        </div>
+        <div class="cap">Morphing menu · <code>.lg-menu</code></div>
+      </div>
+
+      <div class="cell">
+        <div class="glasstext" id="gtext"></div>
+        <div class="cap">Glass text · <code>attachText()</code></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../dist/liquid-glass.js"></script>
+<script src="assets/page.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const { icon } = Page;
+
+$('#buttons').innerHTML = `
+  <button class="lg-button">Glass</button>
+  <button class="lg-button lg-button--prominent">Prominent</button>
+  <button class="lg-button lg-button--icon" aria-label="Like">${icon('heart')}</button>
+  <button class="lg-button lg-button--icon" aria-label="Add">${icon('plus')}</button>`;
+$('#tabs').innerHTML = [['house', 'Home'], ['grid', 'Browse'], ['radio', 'Radio'], ['stack', 'Library']]
+  .map(([ic, l], i) => `<button class="lg-tabbar__item"${i === 0 ? ' aria-current="page"' : ''}>${icon(ic)}<span>${l}</span></button>`).join('');
+$('#toolbar').innerHTML = `<button aria-label="Back">${icon('chevronLeft')}</button><hr><button aria-label="Favourite">${icon('star')}</button><button aria-label="Search">${icon('search')}</button><hr><button aria-label="More">${icon('ellipsis')}</button>`;
+$('#menu-trigger').innerHTML = icon('ellipsis');
+$('#menu-panel').innerHTML = [['Share', 'plus'], ['Favorite', 'star'], ['Duplicate', 'stack'], ['Settings', 'gear']]
+  .map(([t, i]) => `<button class="lg-menu__item">${t}${icon(i)}</button>`).join('');
+
+$('#vol').addEventListener('input', e => { $('#vol-out').textContent = 'value: ' + Math.round(e.target.value); });
+$('#seg').addEventListener('lg-change', e => { $('#seg-out').textContent = 'selected: ' + e.detail.item.textContent; });
+
+LiquidGlass.init();
+LiquidGlass.attachText($('#gtext'), 'Glass', { preset: 'clear', font: '800 104px Inter, system-ui, sans-serif', letterSpacing: -4, bezel: 14, thickness: 26, brightness: 1.25, specular: 1 });
+
+/* attempts: the same components with different material settings */
+const SURFACES = '.lg-button, .lg-segmented, .lg-tabbar, .lg-toolbar, .lg-menu, .lg-thumb, .lg-indicator, [data-liquid-glass]';
+let stopLight = null;
+function reglass(extra) {
+  document.querySelectorAll(SURFACES).forEach(el => {
+    if (el.id === 'gtext') return;
+    const resting = el.matches('.lg-thumb, .lg-indicator') ? 'thumb' : (el.getAttribute('data-liquid-glass') || 'regular');
+    if (extra === null) LiquidGlass.detach(el);
+    else LiquidGlass.attach(el, Object.assign({ preset: resting }, resting === 'thumb' ? {} : extra));
+  });
+}
+Page.init({
+  title: 'Glass Components',
+  start: 1,
+  tries: [
+    { title: 'CSS fallback only', enter() { reglass(null); },
+      desc: `<p>What users get with no refraction: the components' CSS <code>backdrop-filter</code> blur, rim highlight and the same spring interactions.</p>
+        <ul><li>This is also what Firefox and Safari show today.</li></ul>` },
+    { title: 'Library defaults', enter() { reglass({}); },
+      desc: `<p>Exactly what <code>LiquidGlass.init()</code> does out of the box: <b>regular</b> glass on surfaces, <b>thumb</b> glass on resting indicators, the <b>lens</b> preset while pressed.</p>
+        <ul><li>Switch and slider wrap real <code>&lt;input&gt;</code>s, so keyboard, forms and screen readers work.</li>
+        <li>Segmented and tab bar fire <code>lg-change</code> events.</li></ul>` },
+    { title: 'Defaults + moving light + dispersion', enter() { reglass({ chromatic: .06 }); stopLight = LiquidGlass.followPointer(); },
+      exit() { if (stopLight) stopLight(); stopLight = null; LiquidGlass.setLight(-135, { immediate: true }); },
+      desc: `<p>Two lines on top of the defaults:</p>
+        <ul><li><code>LiquidGlass.followPointer()</code>: rim highlights follow the pointer (device tilt on phones).</li>
+        <li><code>chromatic: .06</code>: colour fringing at the rims.</li></ul>` },
+  ],
+});
+</script>
+</body>
+</html>
